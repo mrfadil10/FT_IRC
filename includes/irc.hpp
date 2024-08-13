@@ -52,7 +52,6 @@ class Client
 		std::string		_msg;
 		State		_state;
 		bool		_isoper;
-		// std::vector<Channel>	_channels;
 
 	public:
 		Client(int fd, std::string host);
@@ -87,45 +86,6 @@ class Client
 		void		setIsoper(bool isoper);
 };
 
-// class Channel
-// {
-// 	private:
-// 		std::string		_name;
-// 		std::string		_topic;
-// 		std::string		_chanPass;
-// 		int			_fdOp;
-// 		std::vector<Client>	_clients;
-// 		size_t		_limit;
-
-// 	public:
-// 		Channel(std::string _name);
-// 		~Channel();
-
-// 	// Getters
-
-// 		std::string		getName() const;
-// 		std::string		getTopic() const;
-// 		std::string		getPassword() const;
-// 		int			getFdOp() const;
-// 		size_t		getLimit() const;
-// 		std::vector<Client>	&getClients();
-
-// 	// Setters
-
-// 		void		setTopic(std::string newTopic);
-// 		void		setPassword(std::string password);
-// 		void		setFdOp(int fdOp);
-// 		void		setLimit(size_t limit);
-
-// 	// Channel functions
-
-// 		void		addClient(Client &client);
-// 		void		eraseClient(Client &cl);
-// 		void		broadcast(std::string message, Client &cl);
-// 		void		broadcast(std::string message);
-// 		void		debug();
-// };
-
 class Server
 {
 	private:
@@ -137,7 +97,6 @@ class Server
 
 		std::vector<std::string>		_cmd;
 		std::vector<Client>			_clients;
-		// std::vector<Channel>		_channels;
 		std::vector<pollfd>			_pollfds;
 
 	public:
@@ -171,14 +130,10 @@ class Server
 	Client							&findClient(std::string nickname);
 	std::vector<Client>::iterator	findClientIt(int fd);
 
-	// Channel							&findChannel(std::string name);
-	// std::vector<Channel>::iterator	findChannelIt(std::string name);
-
-	// IRC Commands...
 	int cmdUser(std::vector<std::string> args, Client &cl);
 	int cmdNick(std::vector<std::string> args, Client &cl);
 	int cmdPass(std::vector<std::string> args, Client &cl);
-
+	// IRC Commands...
 };
 
 // utils
