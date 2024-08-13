@@ -44,14 +44,14 @@ enum State
 class Client
 {
 	private:
-		int			_sockfd;
-		std::string		_nickname;
-		std::string		_username;
-		std::string		_realname;
-		std::string		_hostname;
-		std::string		_msg;
-		State		_state;
-		bool		_isoper;
+		int				sockfd;
+		std::string		msg;
+		std::string		nick;
+		std::string		host;
+		std::string		username;
+		std::string		fullname;
+		State			state;
+		bool			_isoper;
 
 	public:
 		Client(int fd, std::string host);
