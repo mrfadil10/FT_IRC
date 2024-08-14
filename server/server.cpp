@@ -6,13 +6,13 @@
 /*   By: mfadil <mfadil@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/08/13 22:50:43 by mfadil           ###   ########.fr       */
+/*   Updated: 2024/08/14 22:50:51 by mfadil           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/irc.hpp"
 
-Server::Server(int port, std::string password) :_port(port), _host("127.0.0.1"), _password(password), _operPassword("operator's password")
+Server::Server(int port, std::string password) :_port(port), _password(password)
 {
 	_sock = createSocket();
 }
@@ -33,7 +33,7 @@ std::string	Client::getUsername() const {
 	return (username);
 }
 
-std::string	Client::getRealname() const {
+std::string	Client::getFullname() const {
 	return (fullname);
 }
 
@@ -41,7 +41,7 @@ std::string	Client::getMsg() const {
 	return (msg);
 }
 
-std::string	Client::getHostname() const {
+std::string	Client::getHost() const {
 	return (host);
 }
 
@@ -61,7 +61,7 @@ void	Client::setNickname(std::string _new) {
 	nick = _new;
 }
 
-void	Client::setRealname(std::string _new) {
+void	Client::setFullname(std::string _new) {
 	fullname = _new;
 }
 
@@ -80,7 +80,7 @@ void	Client::setIsoper(bool Newstate) {
 void	Client::addMsg(std::string message) {
 	msg += message;
 }
-void	Client::setHostname(std::string _new) {
+void	Client::setHost(std::string _new) {
 	host = _new;
 }
 
@@ -138,7 +138,7 @@ void	Server::displayClient()
 		std::cout << BLUE << "client[" << j << "]:" << " registered:" << state
 		<< "   nick:" << _clients.at(j).getNickname()
 		<< "   user:" << _clients.at(j).getUsername()
-		<< "   realname:" << _clients.at(j).getRealname() << RESET << std::endl;
+		<< "   realname:" << _clients.at(j).getFullname() << RESET << std::endl;
 	}
 	std::cout << std::endl;
 	return ;
@@ -175,7 +175,7 @@ void	Server::clientDisconnect(int fd)
 	std::cout << RED << "A client has been disconnected." << RESET << std::endl;
 }
 
-std::vector<std::string> Server::splitCmd(std::string msg)
+std::vector<std::string> Server::splitCommands(std::string msg)
 {
 	int					i = 0;
 	std::vector<std::string>	cmd;
@@ -191,13 +191,27 @@ std::vector<std::string> Server::splitCmd(std::string msg)
 	return (cmd);
 }
 
-std::string	Server::readMsg(int fd)
+std::vector<Client>::iterator	Server::findClientIt(int fd)
+{
+	std::vector<Client>::iterator ret = _clients.begin();
+	std::vector<Client>::iterator end = _clients.end();
+	while (ret != end)
+	{
+		if (ret->getFd() == fd)
+			return (ret);
+		ret++;
+	}
+	throw (std::out_of_range("\033[1;91mError while searching for user\033[0m"));
+}
+
+std::string	Server::readMessage(int fd)
 {
 	std::string	msg;
 	char	buff[256];
 	bzero(buff, 256);
 	std::vector<Client>::iterator cl = findClientIt(fd);
 	msg = cl->getMsg();
+	std::cout << "msg : <" << msg << ">"<< std::endl;
 
 	while (!(std::strstr(buff, "\n")))
 	{
@@ -222,7 +236,7 @@ void	Server::handleMessage(int fd)
 {
 	try
 	{
-		this->_cmd = splitCmd(readMsg(fd));
+		this->_cmd = splitCommands(readMessage(fd));
 		std::cout << this->_cmd.size() << std::endl;
 	}
 	catch (const std::exception& e)
@@ -297,19 +311,6 @@ Client		&Server::findClient(int fd)
 	throw (std::out_of_range("\033[1;91mError while searching for user\033[0m"));
 }
 
-std::vector<Client>::iterator	Server::findClientIt(int fd)
-{
-	std::vector<Client>::iterator ret = _clients.begin();
-	std::vector<Client>::iterator end = _clients.end();
-	while (ret != end)
-	{
-		if (ret->getFd() == fd)
-			return (ret);
-		ret++;
-	}
-	throw (std::out_of_range("\033[1;91mError while searching for user\033[0m"));
-}
-
 Client::Client(int sockfd, std::string hostname) : sockfd(sockfd), host(hostname), _isoper(false)
 {
 	state = HANDSHAKE;
@@ -327,9 +328,9 @@ std::string Client::getPrefix()
 void	Client::reply(std::string msg)
 {
 	std::string prefix = nick + (username.empty() ? "" : "!" + username) + (host.empty() ? "" : "@" + host);
-	std::string paquet = prefix + " " + msg + "\r\n";
-	std::cout << "----> " << paquet << std::endl;
-	if (send(sockfd, paquet.c_str(), paquet.length(), 0) < 0)
+	std::string pack = prefix + " " + msg + "\r\n";
+	std::cout << I_GREEN << "----> " << pack << RESET << std::endl;
+	if (send(sockfd, pack.c_str(), pack.length(), 0) < 0)
 		throw (std::runtime_error("\033[1;91mError while sending message\033[0m"));
 }
 
@@ -363,7 +364,7 @@ void	Server::launch()
 		close(_pollfds[i].fd);
 }
 
-void    Client::welcome()
+void	Client::welcome()
 {
 	if (state != LOGIN || nick.empty() || username.empty())
 	{
@@ -371,6 +372,6 @@ void    Client::welcome()
 		return ;
 	}
 	state = REGISTERED;
-	reply("001 " + nick + " :Welcome " +nick +  " into our irc network");
-	std::cout << nick << " is registered" << std::endl;
+	reply("001 " + nick + " :Welcome " + nick +  " into our irc network");
+	std::cout << B_CYAN << nick << " is registered" << RESET << std::endl;
 }

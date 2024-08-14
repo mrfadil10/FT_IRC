@@ -64,40 +64,37 @@ class Client
 
 	// Getters
 
-		int			getFd() const;
-		std::string		getNickname() const;
-		std::string		getUsername() const;
-		std::string		getRealname() const;
-		std::string		getHostname() const;
 		std::string		getMsg() const;
+		std::string		getNickname() const;
+		std::string		getHost() const;
+		std::string		getUsername() const;
+		std::string		getFullname() const;
 		std::string		getPrefix();
-		State		getState() const;
-		bool		getIsOper() const;
+		State			getState() const;
+		bool			getIsOper() const;
+		int				getFd() const;
 
 	// Setters
 
+		void		setMsg(std::string msg);
 		void		setNickname(std::string nickname);
 		void		setUsername(std::string username);
-		void		setRealname(std::string realname);
-		void		setHostname(std::string hostname);
-		void		setMsg(std::string msg);
-		void		addMsg(std::string msg);
+		void		setFullname(std::string realname);
+		void		setHost(std::string hostname);
 		void		setState(State newState);
 		void		setIsoper(bool isoper);
+		void		addMsg(std::string msg);
 };
 
 class Server
 {
 	private:
-		int						_port;
-		int						_sock;
-		std::string				_host;
-		std::string				_password;
-		std::string				_operPassword;
-
-		std::vector<std::string>		_cmd;
+		std::vector<std::string>	_cmd;
+		int							_port;
+		int							_sock;
 		std::vector<Client>			_clients;
 		std::vector<pollfd>			_pollfds;
+		std::string					_password;
 
 	public:
 		Server(int port, std::string password);
@@ -109,20 +106,15 @@ class Server
 	void	handleMessage(int fd);
 	void	displayClient();
 
-	// Server Command functions
-
-	std::vector<std::string>				splitCmd(std::string msg);
-	void							parseCmd(std::string cmd, Client &cl);
-	std::string							readMsg(int fd);
+	void								parseCmd(std::string cmd, Client &cl);
+	std::vector<std::string>			splitCommands(std::string msg);
+	std::string							readMessage(int fd);
 
 	// Manage Clients
 
-	void							newCl();
-	void							eraseClient(int fd);
-	void							eraseClientChannel(Client &cl);
 	void							clientDisconnect(int fd);
-
-	// Manage Channels
+	void							eraseClient(int fd);
+	void							newCl();
 
 	bool							is_used(Client cl, std::string name);
 
@@ -130,10 +122,11 @@ class Server
 	Client							&findClient(std::string nickname);
 	std::vector<Client>::iterator	findClientIt(int fd);
 
+	// IRC Commands...
+
 	int cmdUser(std::vector<std::string> args, Client &cl);
 	int cmdNick(std::vector<std::string> args, Client &cl);
 	int cmdPass(std::vector<std::string> args, Client &cl);
-	// IRC Commands...
 };
 
 // utils

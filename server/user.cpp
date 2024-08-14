@@ -6,7 +6,7 @@
 /*   By: mfadil <mfadil@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:48:53 by mfadil            #+#    #+#             */
-/*   Updated: 2024/08/12 16:11:38 by mfadil           ###   ########.fr       */
+/*   Updated: 2024/08/14 18:19:49 by mfadil           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	Server::cmdUser(std::vector<std::string> args, Client &cl)
 			tmp = args.at(i);
 		if (i + 1 == args.size())
 		{
-			cl.setRealname(tmp);
+			cl.setFullname(tmp);
 			cl.welcome();
 			return (0);
 		}
@@ -50,7 +50,7 @@ int	Server::cmdUser(std::vector<std::string> args, Client &cl)
 		for (; i < args.size() - 1; i++)
 			tmp += args.at(i) + " ";
 		tmp += args.at(i);
-		cl.setRealname(tmp);
+		cl.setFullname(tmp);
 	}
 	cl.welcome();
 	return (0);
