@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   user.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mfadil <mfadil@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:48:53 by mfadil            #+#    #+#             */
-/*   Updated: 2024/08/14 18:19:49 by mfadil           ###   ########.fr       */
+/*   Updated: 2024/09/12 12:30:36 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 
 int	Server::cmdUser(std::vector<std::string> args, Client &cl)
 {
+	for (size_t i = 0; i < args.size(); i++)
+    {
+        std::cout << "'"+args.at(i)+"'\n";
+    }
+	
 	std::string	tmp;
 	std::string	cmd = args.at(0);
 	if (args.size() < 5)

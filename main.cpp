@@ -2,12 +2,20 @@
 
 bool	g_interrupt = false;
 
-std::string	del_break(std::string str)
+std::string	&del_break(std::string& str)
 {
 	if (str.empty())
-		return ("");
+		return (str);
 	if (str[str.size() - 1] == '\r')
-		return (str.substr(0, (str.size() - 1)));
+		str = str.substr(0, (str.size() - 1));
+	if(str[str.size() - 1] == '\n')
+		str = str.substr(0, (str.size() - 1));
+	if(str[str.size() - 1] == '\v')
+		str = str.substr(0, (str.size() - 1));
+	if(str[str.size() - 1] == '\t')
+		str = str.substr(0, (str.size() - 1));
+	if(str[str.size() - 1] == '\f')
+		str = str.substr(0, (str.size() - 1));
 	return (str);
 }
 
