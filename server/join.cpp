@@ -26,6 +26,7 @@ void REPLY_A(int a,int b,Client &c,Channel &ch,std::string channels)
         ch.sendReplyAll(":" + c.getNickname() + "!" + c.getUsername() + "@" + c.getHost() + " JOIN " +channels + "\r\n", c.getNickname());
 	c.reply(RPL_NAMREPLY(c.getHost(),ch.get_list_of_names(),channels,c.getNickname()));
 	c.reply(RPL_ENDOFNAMES(c.getHost(),c.getNickname(),channels));
+    // c.reply(RPL_CHANNELMODEIS(c.getNickname(),channels,"+ns"));
 }
 int Server::JOIN(std::vector<std::string> args, Client &c)
 {
@@ -52,7 +53,7 @@ int Server::JOIN(std::vector<std::string> args, Client &c)
             Channel ch(channels[i], keys);
             ch.ft_add_Member(c);
             set_Channel(ch);
-            std::cout << "---1-->" << ch.getKey()<<std::endl;
+            // std::cout << "---1-->" << ch.getKey()<<std::endl;
             REPLY_A(0,0,c,ch,channels[i]);
         }else
         {

@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/09/14 18:48:56 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/15 12:59:04 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -690,13 +690,15 @@ void    Channel::inviteChannel(Client &c,std::string pass)
 void		Channel::ft_add_Member(Client &c)
 {
 	c.setIsoper(true);
-	client[&c]=true;
+	Client *cl = new Client(c);
+	client[cl] = true;
 	nbr_client++;
 }
 void		Channel::setClient(Client &c)
 {
 	c.setIsoper(false);
-	client[&c] = false;
+	Client *cl = new Client(c);
+	client[cl] = false;
 	nbr_client++;
 }
 int	Channel::checkIfInviteToChannel(Client &c)
@@ -731,8 +733,8 @@ Client		&Channel::getClientByNickName(std::string Nickname)
 	while (it != client.end())
 	{
 		//std::cout << Nickname+"' '"+(*it).first->getNickname()+"'"<<std::endl;
-		if(Nickname.compare((*it).first->getNickname()) == 0)
-			return *(*it).first;
+		if(Nickname.compare(it->first->getNickname()) == 0)
+			return *it->first;
 		it++;
 	}
 	throw("");
@@ -743,10 +745,10 @@ std::string	Channel::get_list_of_names()
 	std::map<Client*,bool>::iterator itr = client.begin();
 	while (itr != client.end())
 	{
-		if ((*itr).second)
-			names += "@" + (*itr).first->getNickname() + " ";
+		if (itr->second)
+			names += "@" + itr->first->getNickname() + " ";
 		else
-			names += (*itr).first->getNickname() + " ";
+			names += itr->first->getNickname() + " ";
 		itr++;
 	}
 	return names;
@@ -754,53 +756,79 @@ std::string	Channel::get_list_of_names()
 
 void	Channel::sendReplyAll(const std::string &msg, std::string nick_name)
 {
-	// std::map<Client*,bool>::iterator itr = client.begin();
-	// while (itr != client.end())
-	// {
-	// 	if (nick_name != (*itr).first->getNickname())
-	// 	{
-	// 		// send((*itr).first->getFd(), msg.c_str(), msg.le, 0);
-	// 		// std::cout <<"bbbbbbbbbb"<< msg.c_str() << std::endl;
- 	// 		if(send((*itr).first->getFd(), msg.c_str(), msg.length(), 0) < 0)
-	// 			throw std::runtime_error("\033[1;91mError send.\033[0m");
-	// 	}
-	// 	itr++;
-	// }
+		std::map<Client*,bool>::iterator itr = client.begin();
+		while (itr != client.end())
+		{
+			if (nick_name != itr->first->getNickname())
+			{
+				if(send(itr->first->getFd(), msg.c_str(), msg.length(), 0) < 0)
+					throw std::runtime_error("\033[1;91mError send.\033[0m");
+			}
+			itr++;
+		}
+		// std::vector<Client*> clientsToRemove;
 
-	 std::vector<Client*> clients_copy;
-    for (std::map<Client*, bool>::const_iterator it = client.begin(); it != client.end(); ++it)
-    {
-        clients_copy.push_back(it->first);
-    }
+        // std::map<Client*, bool>::iterator it;
+        // for (it = client.begin(); it != client.end(); ++it) {
+        //     Client* client = it->first;
+        //     if (client == NULL) {
+        //         std::cerr << "Warning: Null client encountered." << std::endl;
+        //         continue;
+        //     }
 
-    std::vector<Client*> clients_to_remove;
+        //     if (client->getNickname() != nick_name) {
+        //         int fd = client->getFd();
+        //         if (fd < 0) {
+        //             std::cerr << "Warning: Invalid file descriptor for client " << client->getNickname() << std::endl;
+        //             clientsToRemove.push_back(client);
+        //             continue;
+        //         }
 
-    for (std::vector<Client*>::const_iterator it = clients_copy.begin(); it != clients_copy.end(); ++it)
-    {
-        Client* current_client = *it;
-        if (nick_name != current_client->getNickname())
-        {
-            try 
-            {
-                if(send(current_client->getFd(), msg.c_str(), msg.length(), 0) < 0)
-                {
-                    throw std::runtime_error("\033[1;91mError send.\033[0m");
-                }
-            }
-            catch (const std::exception &e)
-            {
-                std::cerr << "Error sending to client: " << e.what() << std::endl;
-                clients_to_remove.push_back(current_client);
-            }
-        }
-    }
+        //         if (send(fd, msg.c_str(), msg.length(), 0) < 0) {
+        //             std::cerr << "Error sending to client " << client->getNickname() << ": " << strerror(errno) << std::endl;
+        //             clientsToRemove.push_back(client);
+        //         }
+        //     }
+        // }
+        // Remove any clients that had errors
+        // for (size_t i = 0; i < clientsToRemove.size(); ++i) {
+        //     clientsToRemove.clear(clientsToRemove[i]);
+        // }
+		// clientsToRemove.clear();
+	//  std::vector<Client*,bool> clients_copy;
+    // for (std::map<Client*, bool>::const_iterator it = client.begin(); it != client.end(); ++it)
+    // {
+    //     clients_copy.push_back(it->first);
+    // }
+	
+//     std::vector<Client*> clients_to_remove;
 
-    for (std::vector<Client*>::const_iterator remove_it = clients_to_remove.begin();
-         remove_it != clients_to_remove.end(); ++remove_it)
-    {
-        client.erase(*remove_it);
-    }
-}
+//     for (std::vector<Client*>::const_iterator it = clients_copy.begin(); it != clients_copy.end(); ++it)
+//     {
+//         Client* current_client = *it;
+//         if (nick_name != current_client->getNickname())
+//         {
+//             try 
+//             {
+//                 if(send(current_client->getFd(), msg.c_str(), msg.length(), 0) < 0)
+//                 {
+//                     throw std::runtime_error("\033[1;91mError send.\033[0m");
+//                 }
+//             }
+//             catch (const std::exception &e)
+//             {
+//                 std::cerr << "Error sending to client: " << e.what() << std::endl;
+//                 clients_to_remove.push_back(current_client);
+//             }
+//         }
+//     }
+
+//     for (std::vector<Client*>::const_iterator remove_it = clients_to_remove.begin();
+//          remove_it != clients_to_remove.end(); ++remove_it)
+//     {
+//         client.erase(*remove_it);
+//     }
+// }
 // void	Channel::sendReplyAllCl(const std::string &msg)
 // {
 // 	std::map<Client*,bool>::iterator itr = client.begin();
@@ -812,7 +840,7 @@ void	Channel::sendReplyAll(const std::string &msg, std::string nick_name)
 // 			throw std::runtime_error("\033[1;91mError send.\033[0m");
 // 		itr++;
 // 	}
-// }
+}
 void	Server::replys(const Client &c, const std::string &msg)
 {
 	send(c.getFd(), msg.c_str(), strlen(msg.c_str()), 0);
