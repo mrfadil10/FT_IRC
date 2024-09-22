@@ -2,9 +2,9 @@
 
 bool	Server::is_used(Client cl, std::string name)
 {
-	for (std::vector<Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
+	for (std::map<int,Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
 	{
-		if (it->getNickname() == name && it->getFd() != cl.getFd())
+		if (it->second->getNickname() == name && it->second->getFd() != cl.getFd())
 			return (true);
 	}
 	return (false);
