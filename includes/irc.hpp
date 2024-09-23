@@ -320,7 +320,7 @@ class Server
 		int							_port;
 		int							_sock;
 		std::map<int,Client*>			_clients;
-		std::vector<Channel>		_channels;
+		std::map<std::string,Channel*>	_channels;
 		std::vector<pollfd>			_pollfds;
 		std::string					_password;
 		
@@ -347,7 +347,7 @@ class Server
 	//manger Channel 
 	void								set_Channel(Channel const &ch);
 	int									checkIfChannelExist(std::string &target);
-	Channel								&getChannel(std::string &target);
+	Channel								*getChannel(std::string &target);
 	// Manage Clients
 	std::string						getStartTimestp() const;
 	void							clientDisconnect(int fd);

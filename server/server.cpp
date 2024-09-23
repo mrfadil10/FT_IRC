@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/09/22 22:05:32 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/23 01:20:56 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -479,19 +479,13 @@ void		Client::setIsInvisible(bool ischeck)
 //// server channel function
 ////
 
-Channel     &Server::getChannel(std::string &target)
+Channel	*Server::getChannel(std::string &target)
 {
 
-    std::vector<Channel>::iterator i = _channels.begin();
-	while (i != _channels.end())
-	{
-		if(i->get_name().compare(target) == 0)
-		{
-			return *i;
-		}
-		i++;
-	}
-	throw std::runtime_error("Channel not found: " + target);
+    std::map<std::string,Channel*>::iterator i = _channels.find(target);
+	if(i != _channels.end())
+		return i->second;
+	return NULL;
 }
 // int comparison(std::string a,std::string b)
 // {
@@ -508,22 +502,17 @@ Channel     &Server::getChannel(std::string &target)
 // }
 int     Server::checkIfChannelExist(std::string &target)
 {
-    std::vector<Channel>::iterator i = _channels.begin();
-	// std::cout << "OK\r\n";//
-    while(i != _channels.end())
-    {
-		///std::cout << "name ::::"<< i->get_name()<< ":::::"+target<<":::::"<<i->get_name().compare(target)<<std::endl; 
-        if(i->get_name() == target)
-            return 1;
-		i++;
-    }
+    std::map<std::string,Channel*>::iterator i = _channels.find(target);
+	if(i != _channels.end())
+		return 1;
+	// return NULL;
 	return 0;
 }
 
-void	Server::set_Channel(Channel const &ch)
-{
-	_channels.push_back(ch);
-}
+// void	Server::set_Channel(Channel const &ch)
+// {
+// 	_channels.push_back(ch);
+// }
 /////client 
 
 ////
@@ -533,6 +522,10 @@ Channel::Channel(std::string _name,std::string _password):name(_name),password(_
 	isKey = password.size() == 0 ? false : true;
 	isPrivatChannel = false;
 	isInviteOnly = false;
+	std::ostringstream oss;
+    oss << time(NULL);
+    timeSc = oss.str();
+	mode.insert('t');
 	islimit = false;
 	topic = "";
 	nbr_client = 0;
@@ -739,7 +732,6 @@ int Channel::checkIfIsClient(std::string const &nickname)
 int Channel::checkIfIsClientNickName(std::string name)
 {
     std::map<std::string,std::pair<bool,int> >::iterator v = client.find(name);
-	
 	if(v != client.end())
 		return 1;
     return 0;

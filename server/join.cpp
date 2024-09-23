@@ -41,9 +41,9 @@ std::string getChannelTime()
         std::string result(buffer);
     	result += ".000";
 		// std::stringstream ss;
-		// ss << creatchannelTime;
+		ss << creatchannelTime;
 
-    return result;
+    return ss.str();
 
 }
 
@@ -86,16 +86,15 @@ int Server::JOIN(std::vector<std::string> args, Client &c)
         {
             Channel ch(channels[i], keys);
             ch.addClient(c.getFd(),c.getNickname(),true);
-            ch.setMode('t');
-            ch.setTime(getChannelTime());
-            _channels.push_back(ch);
+            _channels[channels[i]] = new Channel(ch);
+            std::cout<<"time =="<< getChannelTime()<<std::endl;
             c.reply(RPL_NOTOPIC(c.getHost(),c.getNickname(),channels[i]));
             c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost(),""));
             c.reply(RPL_NAMREPLY(c.getHost(),ch.get_list_of_names(),channels[i],c.getNickname()));
             c.reply(RPL_ENDOFNAMES(c.getHost(),c.getNickname(),channels[i]));
         }else
         {
-            Channel &cn = getChannel(channels[i]);
+            Channel &cn = *getChannel(channels[i]);
             if(cn.checkIfIsClientNickName(c.getNickname()))
                 c.reply(":is Member\r\n");
             else if(cn.getInviteOnly() == true && !cn.checkIfInviteToChannel(c))
