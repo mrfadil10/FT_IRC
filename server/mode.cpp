@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/09/23 01:15:53 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/23 03:57:55 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,20 +145,19 @@ int    Server::MODE(std::vector<std::string> args, Client &c)
         {
             if(it == args.end())
                 c.reply(ERR_NEEDMOREPARAMS(nick,c.getHost(),"MODE "+target+" +-oitkl operator"));
-            else if(ch->findClientRole(c.getNickname()) != 1)
+            else if(ch->findClientRole(del_break(*it)) != 1)
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
             else if(ch->checkIfIsClientNickName(del_break(*it)) == 0)
                 c.reply(ERR_NOSUCHNICK(c.getHost(),c.getNickname(),del_break(*it)));
             else
             {
-                
-                //Client &client = ch->getClientByNickName(del_break(*it));
+                Client &client = ch->getClientByNickName(del_break(*it));
                 if(ch->findClientRole(del_break(*it)) && flag)
                     continue;
                 if(!ch->findClientRole(del_break(*it)) && !flag)
                     continue;
                 std::string f = flag == true ? "+":"-";
-                ch->setClientRole(del_break(*it),flag);
+                ch->setClientRole(client,flag);
                 c.reply(RPL_MODE(c.getNickname(),c.getUsername(),c.getHost(),target,f+"o",del_break(*it)));
                 ch->sendReplyAll(RPL_MODE(c.getNickname(),c.getUsername(),c.getHost(),target,f+"o",del_break(*it)),c.getNickname());
                 c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),target,f+"o"));

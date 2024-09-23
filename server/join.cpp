@@ -85,7 +85,7 @@ int Server::JOIN(std::vector<std::string> args, Client &c)
         if (checkIfChannelExist(channels[i]) != 1)
         {
             Channel ch(channels[i], keys);
-            ch.addClient(c.getFd(),c.getNickname(),true);
+            ch.addClient(c,true);
             _channels[channels[i]] = new Channel(ch);
             std::cout<<"time =="<< getChannelTime()<<std::endl;
             c.reply(RPL_NOTOPIC(c.getHost(),c.getNickname(),channels[i]));
@@ -105,7 +105,7 @@ int Server::JOIN(std::vector<std::string> args, Client &c)
                 c.reply(ERR_BADCHANNELKEY(c.getNickname(),c.getHost(),channels[i]));
             else 
             {
-                cn.addClient(c.getFd(),c.getNickname(),false);
+                cn.addClient(c,false);
                 c.reply(RPL_TOPICDISPLAY(c.getHost(),c.getNickname(),channels[i],cn.getTopic()));
                 c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost(),""));
                 cn.sendReplyAll(":" + c.getNickname() + "!" + c.getUsername() + "@" + c.getHost() + " JOIN " + channels[i] + "\r\n", c.getNickname());
