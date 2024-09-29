@@ -6,16 +6,21 @@ std::string	&del_break(std::string& str)
 {
 	if (str.empty())
 		return (str);
-	if (str[str.size() - 1] == '\r')
-		str = str.substr(0, (str.size() - 1));
-	if(str[str.size() - 1] == '\n')
-		str = str.substr(0, (str.size() - 1));
-	if(str[str.size() - 1] == '\v')
-		str = str.substr(0, (str.size() - 1));
-	if(str[str.size() - 1] == '\t')
-		str = str.substr(0, (str.size() - 1));
-	if(str[str.size() - 1] == '\f')
-		str = str.substr(0, (str.size() - 1));
+	while (1)
+	{
+		if (str[str.size() - 1] == '\r')
+			str = str.substr(0, (str.size() - 1));
+		else if(str[str.size() - 1] == '\n')
+			str = str.substr(0, (str.size() - 1));
+		else if(str[str.size() - 1] == '\v')
+			str = str.substr(0, (str.size() - 1));
+		else if(str[str.size() - 1] == '\t')
+			str = str.substr(0, (str.size() - 1));
+		else if(str[str.size() - 1] == '\f')
+			str = str.substr(0, (str.size() - 1));
+		else
+			break;
+	}
 	return (str);
 }
 

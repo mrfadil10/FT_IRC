@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/09/23 01:15:53 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/28 23:25:17 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,46 +23,109 @@ long long	aatoi(const char * str)
 	if (str[i] == '-' || str[i] == '+')
 	{
 		if (str[i] == '-')
-			return s;
+			return -1;
 		i++;
 	}
 	while (str[i])
 	{
-		if (std::isdigit(str[i]))
-			break;
+		if (std::isalpha(str[i]))
+			return (-1);
 		s = (s * 10) + (str[i] - '0');
 		i++;
 	}
     s = s > LONG_MAX ? LONG_MAX : s;
 	return (s);
 }
-int    Server::MODE(std::vector<std::string> args, Client &c)
+int     invalidMode(std::string mode)
+{
+    bool flag = false;
+    bool flag1 = false;
+    for (size_t i = 0; i < mode.size(); i++)
+    {
+        if(mode[i] == '-' || mode[i] == '+')
+            flag = true;
+        else if(mode[i] == 'i' || mode[i]=='k' || mode[i] == 't' || mode[i] == 'l'|| mode[i] == 'o')
+            flag1 = true;
+    }
+    if(flag == true && flag1 == false)
+        return 1;
+    return 0;
+}
+std::string makeMode(std::string modeStr)
+{
+    std::set<char> addedModes;
+    std::set<char> removedModes;
+    char currentSign = '\0';
+    for (size_t i = 0; i < modeStr.size(); ++i) {
+        if (modeStr[i] == '+' || modeStr[i] == '-') {
+            currentSign = modeStr[i];
+        } else if (isalpha(modeStr[i]))
+        {
+            if (currentSign == '+') 
+            {
+                addedModes.insert(modeStr[i]);
+                removedModes.erase(modeStr[i]);
+            }
+            else if (currentSign == '-') 
+            {
+                removedModes.insert(modeStr[i]);
+                addedModes.erase(modeStr[i]);  
+            }
+        }
+    }
+    std::stringstream result;
+    std::stringstream addResult, removeResult;
+
+     if (!removedModes.empty()) 
+     {
+        removeResult << "-";
+        for (std::set<char>::iterator it = removedModes.begin(); it != removedModes.end(); ++it) 
+        {
+            removeResult << *it;
+        }
+    }
+
+    if (!addedModes.empty()) {
+        addResult << "+";
+        for (std::set<char>::iterator it = addedModes.begin(); it != addedModes.end(); ++it) {
+            addResult << *it;
+        }
+    }   
+    result << removeResult.str() << addResult.str();
+
+    return result.str();
+    
+}
+int    Server::MODE(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
+    std::vector<std::string> args = splitCommands(cmd);
     if(args.size() == 1)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"MODE #channel +-iotkl xx")),1;
     std::string target = del_break(args[1]);
-    if(checkIfChannelExist(del_break(target)) == 0 )
+    Channel *   ch = getChannel(target);
+    if(!ch)
     {
-        if(c.getNickname().compare(target))
-            return c.reply(RPL_UMODEIS(c.getHost(),c.getNickname(),"+Zi")),1;
-        if(target[0] != '#')
+        if(target[0] == '#')
             return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
+        if(c.getNickname().compare(target) == 0)
+            return c.reply(RPL_UMODEIS(c.getHost(),c.getNickname(),"+Zi")),1;
+        else
+            return c.reply(ERR_NOSUCHNICK(c.getHost(),target)),1;
     }
-    Channel *ch = getChannel(target);
-    if(args.size() == 2)
+    if(args.size() == 2 || (args.size() == 3 && invalidMode(args[2]) == 1))
     {
-        ch->setMode('t');
-        c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),target,ch->getMode()));
-        c.reply(RPL_CREATIONTIME(c.getHost(),c.getNickname(),target,ch->getTime()));
+        if(ch->checkIfIsClient(c.getNickname()))
+            c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),ch->get_name(),ch->getMode()));
+        else
+            c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),ch->get_name(),"+t"));
+        c.reply(RPL_CREATIONTIME(c.getHost(),c.getNickname(),ch->get_name(),ch->getTime()));
         return 1;
     }
-    std::string s = args[3];
     std::string mode = del_break(args[2]);
-    // if(checkIfChannelExist(del_break(target)) == 0 || target[0] != '#')
-    //     return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
-    bool flag ;
+    std::string as,m;
+    bool flag  = true;
     if(ch->checkIfIsClientNickName(c.getNickname()) == 0)
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),c.getNickname())),1;
     std::string nick = c.getNickname();
@@ -76,103 +139,144 @@ int    Server::MODE(std::vector<std::string> args, Client &c)
             if(!ch->findClientRole(c.getNickname()))
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
             else if(flag && ch->getInviteOnly())
-                c.reply(RPL_ALLINV(nick,c.getHost()));
+                continue;// c.reply(RPL_ALLINV(nick,c.getHost()));
             else if(!flag && !ch->getInviteOnly())
-                c.reply(RPL_NOTINV(nick,c.getHost()));
+                continue;//c.reply(RPL_NOTINV(nick,c.getHost()));
             else 
             {
-                ch->setInviteOnly(flag);
                 std::string f = flag == true ? "+":"-";
-                c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),target,f+"i"));
+                as+=f+"i";
+                ch->setInviteOnly(flag);
                 if(flag)
                     ch->setMode('i');
                 else
                     ch->eraseMode('i');
-                //ch.sendReplyAll(RPL_MODE(ch.get_list_of_names(),nick,f+"i"),nick);
             }
         }
         else if(mode[i] == 'k')
         {
             if(it == args.end() && flag)
-                c.reply(ERR_NEEDMOREPARAMS(nick,c.getHost(),"MODE "+target+" +-oitkl KEY"));
+                c.reply("Reply(696): "+target+" k * You must specify a parameter for the key mode. Syntax: <key>.\r\n");
             else if(!ch->findClientRole(c.getNickname()))
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
-            else if(flag == false && ch->get_password().size() == 0)
+            else if(!flag && !ch->getKey())
                 c.reply(ERR_NOKEYSET(c.getHost(),nick,target));
-            else if(!flag)
-            {
-                ch->setKey(flag);
-                c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),target,"-k"));
-                ch->eraseMode('k');
-            }
+            else if(flag && ch->getKey())
+                continue;
             else 
             {
-                ch->setPassword(del_break(*it));
-                ch->setKey(flag);
-                c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),target,"+k"));
-                ch->setMode('k');
-                it++;
-            }
-
+                if(!flag)
+                {
+                    ch->setKey(flag);
+                    ch->eraseMode('k');
+                }
+                else 
+                {
+                    if(del_break(*it).find(' ') != std::string::npos)
+                    {
+                        c.reply(ERROR_INVALIDMODEPARAM__KEY(c.getNickname(),target,c.getHost(),del_break(*it)));
+                        continue;
+                    }
+                    ch->setPassword(del_break(*it));
+                    ch->setKey(flag);
+                    m += del_break(*it)+" ";
+                    ch->setMode('k');
+                    it++;
+                }
+                std::string f = flag == true ? "+":"-";
+                as+=f+"k";
+            } 
         }else if(mode[i]== 't')
         {
             if(!ch->findClientRole(c.getNickname()))
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
+            else if(ch->getChTopOp() && flag)
+                continue;
+            else if(!ch->getChTopOp() && !flag)
+                continue;
+            else
+            {
+                std::string f = flag == true ? "+":"-";
+                as+=f+"t";
+                ch->setChTopOp(flag);
+            }
         }
         else if(mode[i] == 'l')
         {
             if(it == args.end() && flag)
-                c.reply(ERR_NEEDMOREPARAMS(nick,c.getHost(),"MODE "+target+" +-oitkl limit"));
-            if(!ch->findClientRole(c.getNickname()))
-                c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target+"1"));
-            else if(!flag)
+                c.reply(ERROR_INVALIDMODEPARAM_LIMIT(target,c.getHost(),"*"));
+            else if(!ch->findClientRole(c.getNickname()))
+                c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
+            else if(!ch->getLimit() && !flag)
+                continue;
+            else 
             {
-                ch->setLimit(flag);
-                ch->setMaxClient(-1);
-                c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),target,"-l"));
-                ch->eraseMode('l');
+                if(!flag)
+                {
+                    ch->setLimit(flag);
+                    ch->setMaxClient(-1);
+                    ch->eraseMode('l');
+                }
+                else
+                {
+                    if(aatoi(del_break(*it).c_str()) == -1)
+                    {
+                        c.reply(ERROR_INVALIDMODEPARAM_LIMIT(target,c.getHost(),del_break(*it)));
+                        continue;
+                    }
+                    // if(aatoi(del_break(*it).c_str()) == 0)
+                    // {
+                    //     ch->setLimit(false);
+                    //     ch->setMaxClient(0);
+                    //     ch->eraseMode('l');
+                    // }
+                    else
+                    {
+                        ch->setLimit(flag);
+                        ch->setMaxClient(aatoi(del_break(*it).c_str()));
+                        ch->setMode('l');
+                    }
+                    m += del_break(*it)+" ";
+                    it++;
+                }
+                std::string f = flag == true ? "+":"-";
+                as+=f+"l";
             }
-            else
-            {
-                ch->setLimit(flag);
-                ch->setMaxClient(aatoi(del_break(*it).c_str()));
-                 c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),target,"+l"));
-                ch->setMode('l');
-                it++;
-            }
+            
         }
         else if(mode[i] ==  'o')
         {
             if(it == args.end())
-                c.reply(ERR_NEEDMOREPARAMS(nick,c.getHost(),"MODE "+target+" +-oitkl operator"));
+                c.reply(ERROR_INVALIDMODEPARAM_OP(target,c.getHost()));
             else if(ch->findClientRole(c.getNickname()) != 1)
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
             else if(ch->checkIfIsClientNickName(del_break(*it)) == 0)
-                c.reply(ERR_NOSUCHNICK(c.getHost(),c.getNickname(),del_break(*it)));
+                c.reply(ERR_NOSUCHNICK(c.getHost(),del_break(*it)));
             else
             {
-                
                 //Client &client = ch->getClientByNickName(del_break(*it));
                 if(ch->findClientRole(del_break(*it)) && flag)
                     continue;
                 if(!ch->findClientRole(del_break(*it)) && !flag)
                     continue;
                 std::string f = flag == true ? "+":"-";
+                as+=f+"o";
+                m += del_break(*it)+" ";
                 ch->setClientRole(del_break(*it),flag);
-                c.reply(RPL_MODE(c.getNickname(),c.getUsername(),c.getHost(),target,f+"o",del_break(*it)));
-                ch->sendReplyAll(RPL_MODE(c.getNickname(),c.getUsername(),c.getHost(),target,f+"o",del_break(*it)),c.getNickname());
-                c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),target,f+"o"));
-                c.reply(RPL_UMODEIS(c.getHost(),del_break(*it),f+"o"));
                 if(flag)
                     ch->setMode('o');
                 else
                     ch->eraseMode('o');
                 it++;
             }
-        }else if(mode[i] == 'n' || mode[i] == 's' || mode[i] == '\r')
-            continue;
-        else 
-            c.reply(ERR_UMODEUNKNOWNFLAG(c.getNickname()));
+            
+        }else
+            c.reply(ERR_UNKNOWNMODE(c.getNickname(),c.getHost(),target,mode[i]));
+    }
+    if(!as.empty())
+    {
+        c.reply(RPL_MODE(c.getNickname(),c.getUsername(),c.getHost(),target,makeMode(as),m));
+        ch->sendReplyAll(RPL_MODE(c.getNickname(),c.getUsername(),c.getHost(),target,makeMode(as),m),c.getNickname());
     }
     return 0;
 }

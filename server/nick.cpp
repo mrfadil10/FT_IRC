@@ -52,24 +52,16 @@ std::string NICK_SUCCESS(std::string newNick)
 	return ("\033[1;92mNICK " + newNick + "\033[0m");
 }
 
-int Server::cmdNick(std::vector<std::string> args, Client& client)
+int Server::cmdNick(std::string cmd, Client& client)
 {
+	std::vector<std::string> args = splitCommands(cmd);
 	if (args.size() < 2) return (client.reply(ERRMSG_EMPTY(client)), -1);
-	for (size_t i = 0; i < args.size(); i++)
-    {
-        std::cout << args[i] << std::endl;
-		std::cout << args[i].size() << std::endl;
-    }
 	std::string requestedNick = del_break(args[1]);
 	std::string oldnick = client.getNickname().empty() ? client.getNickname() : "";
 	if (!is_valid_nick(requestedNick))
 		return (client.reply(NICK_ERR(client, requestedNick)), -1);
-
 	if (is_used(client, requestedNick))
 		return (client.reply(ERRMSG_ALREADYUSED(client, requestedNick)), -1);
-
-	// if(!oldnick.empty())
-	// 	getAllChannelAddByClient(client,oldnick,requestedNick);
 	client.reply(NICK_SUCCESS(requestedNick));
 	client.setNickname(requestedNick);
 	client.welcome();

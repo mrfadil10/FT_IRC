@@ -10,6 +10,11 @@ SRCS = ./server/server.cpp \
 	   ./server/nick.cpp \
 	   ./server/mode.cpp \
 	   ./server/join.cpp \
+	   ./server/topic.cpp \
+	   ./server/kick.cpp \
+	   ./server/part.cpp \
+	   ./server/invite.cpp \
+	   ./server/pm.cpp \
 	   ./main.cpp
 
 DSYM = ./ircserv.dSYM

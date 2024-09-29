@@ -27,11 +27,6 @@
 #include <stdlib.h>
 // #include "Channel.hpp"
 
-// #define MODE_CLIENT_LIMIT 1		//+l
-// #define MODE_INVITE_ONLY 2		//+i
-// #define MODE_KEY 4				//+k
-// #define MODE_PROTECTED_TOPIC 8	//+t
-// #define	MODE_OPERATOR_PRIV 16		//+o
 
 #define RED			"\033[1;91m"
 #define GREEN		"\033[32m"
@@ -42,19 +37,25 @@
 #define I_GREEN		"\033[1;92m"
 #define RESET		"\033[0m"
 
+#define ERR_NOTEXTTOSEND(host, nick) ":" + host + " 412 " + nick + " :No text to send\r\n"
+#define RPL_PRIVMSG(nick,username,hostname,target,comment) ":"+nick+"!~"+username+"@"+hostname+" PRIVMSG "+target+" :"+comment+"\r\n"
+#define ERR_NORECIPIENT(host, nick, command) ":" + host + " 411 " + nick + " :No recipient given (" + command + ")\r\n"
 #define ERR_CHANOPRIVSNEEDED(hostname, channel) ":" + hostname + " 482 " + channel + " :You're not channel operator\r\n"
-#define RPL_MODE(nick, username, host,target,mode,target_nick) ":" + nick + "!" + username + "@" + host + " MODE " + target + " " + mode + " " + target_nick + "\r\n"
+#define RPL_MODE(nick, username, host,target,mode,target_nick) ":" + nick + "!~" + username + "@" + host + " MODE " + target + " " + mode + " " + target_nick + "\r\n"
+#define RPL_INVITE(nick, username, host,target,target_nick) ":" + nick + "!~" + username + "@" + host + " INVITE " + target_nick + " " + target + "\r\n"
+#define RPL_KICK(nick, username, host,target,target_nick,message) ":" + nick + "!~" + username + "@" + host + " KICK " + target + " " + target_nick + " :" + message + "\r\n"
+#define RPL_TOPIC(nick, username, host,target,topic) ":" + nick + "!~" + username + "@" + host + " TOPIC " + target + " :" + topic + "\r\n"
 #define RPL_NOTINV(nickname,hostname) (":" + hostname + " 664 " + nickname + ": Channel already not in invite-only mode\r\n")
 #define ERR_UNKNOWNCOMMAND(hostname, nick, arg) ":" + hostname + " 421 " + nick + " " + arg + " :Unknown command\r\n"
 #define ERR_NEEDMOREPARAMS(nick, hostname, cmd) ":" + hostname + " 461 " + nick + " " + cmd + " :Not enough parameters\r\n"
 #define ERR_NOSUCHCHANNEL(hostname, nick, channel) ":" + hostname + " 403 " + nick + " " + channel + " :No such channel\r\n"
 #define ERR_USERNOTINCHANNEL(hostname, nick, nick2, chann) ":" + hostname + " 441 " + nick + " " + nick2 + " " + chann + " :They aren't on that channel\r\n"
-#define ERR_NOSUCHNICK(hostname, nick, nick2) ":" + hostname + " 401 " + nick + " " + nick2 + " :No such nick\r\n"
+// #define (hostname, nick, nick2) ":" + hostname + " 401 " + nick + " " + nick2 + " :No such nick\r\n"
 #define ERR_KEYSET(hostname, nick, chann) ":" + hostname + " 467 " + nick + " " + chann + " :Channel key already set\r\n"
 #define ERR_NOKEYSET(hostname, nick, chann) ":" + hostname + " 467 " + nick + " " + chann + " :Cannot remove channel key (no key set)\r\n"
-#define ERR_UNKNOWNMODE(hostname, nick, c) ":" + hostname + " 472 " + nick + " " + c + " :is unknown mode char to me\r\n"
+// #define ERR_UNKNOWNMODE(hostname, nick, c) ":" + hostname + " 472 " + nick + " " + c + " :is unknown mode char to me\r\n"
 #define ERR_NOTREGISTERED(nick, hostname) ":" + hostname + " 451 " + nick + " :You have not registered\r\n"
-#define ERR_USERONCHANNEL(hostname, nick, nick2, chann) ":" + hostname + " 443 " + nick + " " + nick2 + " " + chann + " :is already on channel\r\n"
+#define ERR_USERONCHANNEL(hostname, nick, chann) ":" + hostname + " 443 " + nick + " " + chann + " :is already on channel\r\n"
 #define ERR_NOTONCHANNEL(hostname, chann) ":" + hostname + " 442 " + chann + " " + ":You're not on that channel\r\n"
 #define ERR_CANNOTSENDTOCHAN(hostname, nick, channel) ":" + hostname + " 404 " + nick + " " + channel + " :Cannot send to channel\r\n"
 //#define ERR_PASSWDMISMATCH(nick, hostname) ":" + hostname + " 464 " + nick + " :Password incorrect !\r\n"
@@ -79,17 +80,17 @@
 #define NICKNAME_RPLY(nickname, username, hostname, newNickName)  ":" + nickname + "!~" + username + "@" + hostname + " NICK :" + newNickName  + "\r\n"
 extern bool g_interrupt;
 #define RPL_UMODEIS(hostname,client, user_modes) ":" + hostname + " 221 " + client + " " + user_modes + "\r\n"
-#define ERR_UMODEUNKNOWNFLAG(nickname) ": 501 " + nickname + " Unknown MODE flag\r\n"
+// #define ERR_UMODEUNKNOWNFLAG(nickname) ": 501 " + nickname + " Unknown MODE flag\r\n"
 #define RPL_CREATIONTIME(hostname,nickname,channelName,creationTime) ":" + hostname + " 329 " + nickname + " " + channelName + " " + creationTime+"\r\n"
 /// join 
-
+#define RPL_INVITING(hostname,nick,target_nick,channel) ":"+hostname+" 341 "+nick+" "+target_nick+" "+ channel +"\r\n"
 #define RPL_NOTOPIC(hostname,nick,channelname)":"+hostname+" 331 " +nick+ " " + channelname + " :no topic is set\r\n"
 #define RPL_ENDOFNAMES(hostname, nick, channelname) ":" + hostname + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
 #define RPL_NAMREPLY(hostname, clients, channelname, nick) ":" + hostname + " 353 " + nick + " = " + channelname + " :" + clients + "\r\n"
-#define RPL_JOIN(nick, username, channelname, ipaddress,mode) ":" + nick + "!~" + username + "@" + ipaddress + " JOIN " + channelname + "\r\n"
+#define RPL_JOIN(nick, username, channelname, ipaddress) ":" + nick + "!~" + username + "@" + ipaddress + " JOIN " + channelname + "\r\n"
 
 
-#define REPLY_WELCOME(nick, hostname) ":" + hostname + " 001 " + nick + " :Welcome " + nick + " to the ft_irc network !\r\n"
+#define REPLY_WELCOME(nick,username, hostname) ":" + hostname + " 001 "+nick +" :Welcome to the ExampleNet IRC Network, "+nick+"!"+username+"@"+hostname+"\r\n"
 #define REPLY_YOURHOST(nick, hostname) ":" + hostname + " 002 " + nick + " :Your host is " + hostname + " running version 1.0 !\r\n"
 #define REPLY_CREATED(nick, hostname, formatted_time) ":" + hostname + " 003 " + nick + " :This server was created " + formatted_time + " !\r\n"
 
@@ -103,7 +104,7 @@ extern bool g_interrupt;
 // #define REPLY_NICKCHANGE(oldNick, nick, hostname) ":" + oldNick + "!~u@" + hostname + " NICK " + nick + "\r\n"
 // #define ERROR_NEEDMOREPARAMS(nick, hostname) (std::string (":") + hostname + std::string(" 461 ") + nick + " :Not enough parameters !\r\n")
 
-// #define PART_REPLY(nickname, username, hostname, channel, reason) ":" + std::string(nickname) + "!~" + std::string(username) + "@" + std::string(hostname) + " PART " + std::string(channel) + " :" + reason + "\r\n"
+#define PART_REPLY(nickname, username, hostname, channel, reason) ":" + nickname + "!~" + username + "@" + hostname + " PART " + channel + " :" + reason + "\r\n"
 
 // #define RPL_AWAY(sender , username, hostname, message , nick_resever) ":" + std::string(sender) + "!~" + std::string(username) + "@" + std::string(hostname) + " PRIVMSG " + nick_resever + " :" + message + "\r\n"
 
@@ -115,15 +116,16 @@ extern bool g_interrupt;
 // #define REPLY_TOPICDISPLAY(hostname, nick, channel, topic) ":" + hostname + " 332 " + nick + " " + channel + " :" + topic + "\r\n"
 
 
-// #define REPLY_TOPICWHOTIME(topicsetter, topic_time, nick, hostname, channelName) ":" + hostname + " 333 " + nick + " " + channelName + " " + topicsetter + "!~" + topicsetter + "@" + hostname + " " + topic_time + "\r\n"
+#define REPLY_TOPICWHOTIME(username, topic_time, nick, hostname, channelName) ":" + hostname + " 333 " + nick + " " + channelName + " " + nick + "!~" + username + "@" + hostname + " " + topic_time + "\r\n"
 // #define REPLY_NAMREPLY(hostname, clients, channelname, nick) ":" + hostname + " 353 " + nick + " = " + channelname + " :" + clients + "\r\n"
 // #define REPLY_ENDOFNAMES(hostname, nick, channelname) ":" + hostname + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
 
-// #define ERROR_INVALIDMODEPARAM_LIMIT(channel, hostname, flag) ":" + hostname + " 696 " + channel + " " + flag + " * You must specify a parameter for the limit mode. Syntax: <limit>.\r\n"
-// #define ERROR_INVALIDMODEPARAM(channel, hostname, flag) ":" + hostname + " 696 " + channel + " " + flag + " * you must specifiy a parameter for the op mode. Syntax: <nick>.\r\n"
+#define ERROR_INVALIDMODEPARAM_LIMIT(channel, hostname,arg) ":" + hostname + " 696 " + channel + " l "+arg+" You must specify a parameter for the limit mode. Syntax: <limit>.\r\n"
+// #define ERROR_INVALIDMODEPARAM_LIMIT(channel, hostname) ":" + hostname + " 696 " + channel + " l "+a+" You must specify a parameter for the limit mode. Syntax: <limit>.\r\n"
+#define ERROR_INVALIDMODEPARAM_OP(channel, hostname) ":" + hostname + " 696 " + channel + " o * you must specifiy a parameter for the op mode. Syntax: <nick>.\r\n"
 // #define ERROR_INVALIDKEY(channel, hostname, key) ":" + hostname + " 525 " + channel + " :Key is not well-formed :`" + key + "`\r\n"
-// #define ERROR_INVALIDMODEPARAM__KEY(channel, hostname, flag) ":" + hostname + " 696 " + channel + " " + flag + " * You must specify a parameter for the key mode. Syntax: <key>.\r\n"
-// #define ERROR_USERNOTINCHANNEL(hostname, channel) ":" + hostname + " 441 " + channel + " " + ":they aren't on that channel\r\n"
+#define ERROR_INVALIDMODEPARAM__KEY(nick,channel, hostname, param) ":"+hostname+" 696 "+nick+" "+channel+" k * :Invalid mode k parameter: '"+param+"'\r\n"
+#define ERROR_USERNOTINCHANNEL(hostname, channel,target_nick) ":" + hostname + " 441 " + channel + " " +target_nick +" :they aren't on that channel\r\n"
 // #define ERROR_NOPRIVILEGES(hostname, channel) ":" + hostname + " 482 " + channel + " " + ":You're not a channel operator\r\n"
 // #define ERROR_NOPRIVILEGES__(hostname, channel, flag) ":" + hostname + " 482 " + channel + " " + ":You're not a channel operator to set channel mode " + flag + "\r\n"
 
@@ -140,7 +142,7 @@ extern bool g_interrupt;
 
 // #define REPLY_SETTOPIC(nick, uname, hostname, channel, topic) ":" + nick + "!~" + uname + "@" + hostname + " TOPIC " + channel + " :" + topic + "\r\n"
 
-// #define ERR_UNKNOWNMODE(nick, hostname, channel, character) ":" + hostname + " 472 " + nick + " " + channel + " " + character + " :is unknown mode character to me\r\n"
+#define ERR_UNKNOWNMODE(nick, hostname, channel, character) ":" + hostname + " 472 " + nick + " " + channel + " " + character + " :is unknown mode character to me\r\n"
 // #define REPLY_YOUREOPER(hostname, nick) ":" + hostname + " 381 " + nick + ":You are now an IRC operator\r\n"
 // #define REPLY_KICK(kicker, username, host, channel, targetuser, reason) ":" + kicker + "!" + username + "@" + host + " KICK " + channel + " " + targetuser + " :" + reason + "\r\n"
 // #define PRIVMSG_FORMAT(senderNick, senderUsername, senderHostname, receiver, message) ":" + senderNick + "!~" + senderUsername + "@" + senderHostname + " PRIVMSG " + receiver + " :" + message + "\r\n"
@@ -155,7 +157,7 @@ extern bool g_interrupt;
 // #define RPL_TOPIC(hostname, channel, topic) ":" + hostname + " 332 " + channel + " :" + topic + "\r\n"
 // #define ERR_NOTONCHANNEL(hostname, channel, nick) ":" + hostname + " 442 " + nick + " " + channel + " :You're not on that channel\r\n"
 // #define ERR_NOTEXTTOSEND(hostname) ":" + hostname + " 412 " + ":No text to send\r\n"
-// #define ERR_NOSUCHNICK(hostname, nick) ":" + hostname + " 401 " + nick + " :No such nick\r\n"
+#define ERR_NOSUCHNICK(hostname, nick) ":" + hostname + " 401 " + nick + " :No such nick\r\n"
 
 // #define ERROR_NEEDTOREGISTER(nick, hostname, command) ":" + hostname + " 422 " + nick + " " + command + " :You need to register before you can use that command\r\n"
 // #define ERROR_REALNAME(nick, hostname) ":" + hostname + " 423 " + nick + " :Error in realename !\r\n"
@@ -251,12 +253,14 @@ class Channel
 		std::vector<Client> invite;
 		std::vector<int> fdClient;
 		std::set<char> mode;
-		std::string timeInform;
-		std::string timeSc;
+		std::string timeScTo;
+		std::string timeScCh;
+		std::string arg;
 		bool isKey;
 		bool islimit;
 		bool isInviteOnly;
-		bool isPrivatChannel;
+		bool isTopic;
+		bool chTopicOp;
     public:
         Channel(std::string _name,std::string _password);
         ~Channel();
@@ -264,6 +268,7 @@ class Channel
 		void	setFdClien(int fd);
         Channel &operator=(const Channel &c);
 		std::vector<int>& getClientFds() { return fdClient; }
+		int getModeSize();
     	// const std::map<std::string, bool>& getClients() const { return client; }
         std::string get_name() const;
         std::string get_password() const;
@@ -271,18 +276,18 @@ class Channel
         long long get_nbr_client() const;
         long long get_max_client() const;
 		std::string getTopicTimestp() const;
+		void	eraseClient(std::string nickname);
 		bool getLimit()const;
 		bool getInviteOnly() const;
 		bool getKey()const;
 		void setMode(char s);
 		void eraseMode(char s);
-		std::string getMode() const;
+		std::string getMode();
 		bool hasMode(char mode) const;
-		void setTime(std::string const &time)
-		{
-			this->timeSc = time;
-		}
+		void setTime(std::string const &time);
+		void setTimeTop(std::string const &time);
 		std::string getTime();
+		std::string getTimeTop();
 		// std::string get_mode_string() const;
 		void allClientInChannel();
 		void getMemberOp();
@@ -294,6 +299,10 @@ class Channel
         void setTopic(std::string &_topic);
         void setClientRole(std::string const &nickname, bool role);
 		void setKey(bool key);
+		void setIsTopic(bool istopic);
+		bool getIsTopic();
+		void setChTopOp(bool istopic);
+		bool getChTopOp();
 		void setClient(std::string const &nickname,bool role);
 		void	addClient(int fd, const std::string& nickname, bool isOperator);
 		// void setMode(char mode);
@@ -306,7 +315,7 @@ class Channel
         int		checkIfIsClient(std::string const &nickname);
 		int		checkIfIsInvite(const Client &c);
         // void    ft_add_to_channel(Client &c,std::string pass);
-        void    ft_rm_client(Client &c);
+        void    removeClientNickName(std::string const &nickname);
 		int		checkIfInviteToChannel(Client &c);
 		void    inviteChannel(Client &c,std::string pass);
 		void	addMember(std::string const &name);
@@ -316,7 +325,7 @@ class Channel
 class Server
 {
 	private:
-		std::vector<std::string>	_cmd;
+		std::string					_cmd;
 		int							_port;
 		int							_sock;
 		std::map<int,Client*>			_clients;
@@ -338,6 +347,7 @@ class Server
 	std::vector<std::string>			splitCommands(std::string msg);
 	std::vector<std::string> 			splitChannel(std::string msg);
 	std::string							readMessage(int fd);
+	Client								*getClientByNickNameS(std::string Nickname);
 	// std::vector<Client>::iterator getClientFds()
 	// {
 	// 	std::vector<Client>::iterator it = this->_clients.begin();
@@ -348,6 +358,7 @@ class Server
 	void								set_Channel(Channel const &ch);
 	int									checkIfChannelExist(std::string &target);
 	Channel								*getChannel(std::string &target);
+	void			joinZero(Client &c);
 	// Manage Clients
 	std::string						getStartTimestp() const;
 	void							clientDisconnect(int fd);
@@ -362,17 +373,22 @@ class Server
 	std::map<int,Client*>::iterator	findClientIt(int fd);
 
 	// IRC Commands...
-	int    MODE(std::vector<std::string> args, Client &c);
-	int JOIN(std::vector<std::string> args, Client &c);
-	int cmdUser(std::vector<std::string> args, Client &cl);
-	int cmdNick(std::vector<std::string> args, Client &cl);
-	int cmdPass(std::vector<std::string> args, Client &cl);
+	int		MODE(std::string args, Client &c);
+	int		JOIN(std::string args, Client &c);
+	int		TOPIC(std::string args, Client &c);
+	int		KICK(std::string args, Client &c);
+	int		INVITE(std::string args, Client &c);
+	int    PART(std::string cmd, Client &c);
+	int cmdUser(std::string args, Client &cl);
+	int cmdNick(std::string args, Client &cl);
+	int cmdPass(std::string args, Client &cl);
+	int PRIVMSG(std::string args, Client& client);
 	
 };
 
 // utils
-
+long long	aatoi(const char * str);
 std::string	&del_break(std::string &str);
 std::string	ERROR_NEED_MORE_PARAMETERS(Client &client, std::string cmd);
-
+std::string getTimeSc();
 #endif

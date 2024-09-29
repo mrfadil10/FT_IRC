@@ -13,15 +13,16 @@ int		teststring(std::string test)
 	{
 		if (tst[i] == '\r')
 		{
-			std::cout << "character number : " << i << " Line Break\n";
+			// std::cout << "character number : " << i << " Line Break\n";
 			return (1);
 		}
 	}
 	return (0);
 }
 
-int Server::cmdPass(std::vector<std::string> pswrd, Client &cl)
+int Server::cmdPass(std::string arg, Client &cl)
 {
+	std::vector<std::string> pswrd = splitCommands(arg);
 	if (pswrd.size() < 2)
 	{
 		cl.reply(ERROR_NEED_MORE_PARAMETERS(cl, "Password"));

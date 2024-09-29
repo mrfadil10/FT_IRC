@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/09/23 01:20:56 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/29 23:00:11 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ int		Server::createSocket()
 	serv_address.sin_port = htons(_port);
 	serv_address.sin_family = AF_INET;
 	serv_address.sin_addr.s_addr = INADDR_ANY;
-
 	if (bind(sockfd, (struct sockaddr *) &serv_address, sizeof(serv_address)) < 0)
 		throw std::runtime_error("\033[1;91mError while binding socket.\033[0m");
 	if (listen(sockfd, 1000) < 0)
@@ -138,13 +137,16 @@ void	Server::displayClient()
 	size_t i = _clients.size();
 	std::map<int,Client*>::iterator it = _clients.begin();
 	std::cout << GREEN << "Clients connected: " << i << RESET << std::endl;
-	for (size_t j = 0; j < i; j++)
+	int j = 0;
+	while(it != _clients.end())
 	{
 		state = (it->second->getState() == REGISTERED) ? "yes" : "no";
 		std::cout << BLUE << "client[" << j << "]:" << " registered:" << state
 		<< "   nick:" << it->second->getNickname()
 		<< "   user:" << it->second->getUsername()
 		<< "   realname:" << it->second->getFullname() << RESET << std::endl;
+		j++;
+		it++;
 	}
 	std::cout << std::endl;
 	return ;
@@ -183,18 +185,42 @@ void	Server::clientDisconnect(int fd)
 
 std::vector<std::string> Server::splitCommands(std::string msg)
 {
-	// int					i = 0;
-	std::vector<std::string>	cmd;
-	std::stringstream	str(msg);
-	std::string				tm;
-	if (msg == "\n")
-		return (cmd);
-	while (std::getline(str, tm, '\n'))
+
+	// std::vector<std::string>	cmd;
+	// std::stringstream	str(msg);
+	// std::string				tm;
+	// if (msg == "\n")
+	// 	return (cmd);
+	// while (std::getline(str, tm, '\n'))
+	// {
+	// 	cmd.push_back(tm);
+
+	// }
+	// return (cmd);
+    std::vector<std::string> cmd;
+    std::string part;
+    std::istringstream iss(msg);
+	
+    while (std::getline(iss, part, ' ')) 
 	{
-		cmd.push_back(tm);
-		// std::cout << cmd.at(i++) << std::endl;
-	}
-	return (cmd);
+        size_t colonPos = part.find(':');
+        if (colonPos != std::string::npos) {
+            if (colonPos > 0) {
+                cmd.push_back(part.substr(0, colonPos));
+            }
+            std::string restOfMessage = part.substr(colonPos + 1);
+            std::string remaining;
+            if (std::getline(iss, remaining)) {
+                restOfMessage += " " + remaining;
+            }
+			
+            cmd.push_back(restOfMessage);
+            return cmd; 
+        }
+		if(!part.empty())
+			cmd.push_back(part);
+    }
+    return cmd;
 }
 
 std::map<int,Client*>::iterator	Server::findClientIt(int fd)
@@ -240,7 +266,7 @@ void	Server::handleMessage(int fd)
 {
 	try
 	{
-		this->_cmd = splitCommands(readMessage(fd));
+		this->_cmd = readMessage(fd);
 		// std::cout << this->_cmd.size() << std::endl;
 	}
 	catch (const std::exception& e)
@@ -249,7 +275,8 @@ void	Server::handleMessage(int fd)
 		std::cerr << e.what() << '\n';
 		return ;
 	}
-	for (std::vector<std::string>::iterator it = this->_cmd.begin(); it != this->_cmd.end(); it++)
+	std::vector<std::string> v = splitCommands(this->_cmd); 
+	for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 		parseCmd(*it, *findClient(fd));
 	displayClient();
 }
@@ -260,19 +287,24 @@ void	Server::parseCmd(std::string str, Client &cl)
 	std::vector<std::string> args;
 	std::stringstream	ss(str);
 	std::getline(ss, tmp, ' ');
-	std::cout <<ss.str()+"      "<< tmp<<std::endl;
+	// std::cout <<ss.str()+"      "<< tmp<<std::endl;
 	args.push_back(tmp);
-	std::cout << "Parse command : [" << tmp << "]" << std::endl;
+	// std::cout << "Parse command : [" << tmp << "]" << std::endl;
 
-	std::string cmds[15] = {"PASS", "NICK", "USER", "JOIN","MODE", "OPERATOR", "PRIVATE MESSAGE", "KILL", "PING", "PART", "LIST", "NAMES", "TOPIC", "KICK", "NOTICE"};
-	// std::string cmds[15] = {"pass", "nick", "user", "join","mode", "ORATOR", "PRIVATE MESSAGE", "KILL", "PING", "PART", "LIST", "NAMES", "TOPIC", "KICK", "NOTICE"};
+	std::string cmds[15] = {"PASS", "NICK", "USER", "JOIN","MODE", "TOPIC", "KICK", "PART", "INVITE", "PRIVMSG", "LIST", "NAMES", "TOPIC", "KICK", "NOTICE"};
+	//std::string cmds[15] = {"pass", "nick", "user", "join","mode", "topic", "kick", "KILL", "PING", "PART", "LIST", "NAMES", "TOPIC", "KICK", "NOTICE"};
 
-	int		(Server::*ptr[15])(std::vector<std::string> args, Client &cl) = {
+	int		(Server::*ptr[15])(std::string cmd, Client &cl) = {
 			&Server::cmdPass,
 			&Server::cmdNick,
 			&Server::cmdUser,
 			&Server::JOIN,
-			&Server::MODE, 
+			&Server::MODE,
+			&Server::TOPIC,
+			&Server::KICK,
+			&Server::PART,
+			&Server::INVITE,
+			&Server::PRIVMSG,
 			// &Server::OperCmd,
 			// &Server::PrivMsgCmd,
 			// &Server::KillCmd,
@@ -290,7 +322,7 @@ void	Server::parseCmd(std::string str, Client &cl)
 		{
 			while (std::getline(ss, tmp, ' '))
 				args.push_back(tmp);
-			(this->*ptr[i])(args, cl);
+			(this->*ptr[i])(this->_cmd, cl);
 			return ;
 		}
 	}
@@ -388,16 +420,29 @@ std::string Client::getPrefix()
 	std::string prefix = ":" + nick + (username.empty() ? "" : "!" + username) + (host.empty() ? "" : "@" + host);
 	return (prefix);
 }
-
+void	Channel::eraseClient(std::string nickname)
+{
+	client.erase(nickname);
+}
 void	Client::reply(std::string msg)
 {
-	// std::string prefix = nick + (username.empty() ? "" : "!" + username) + (host.empty() ? "" : "@" + host);
-	// std::string pack = msg + "\r\n";
 	std::cout << I_GREEN << "----> " << msg << RESET << std::endl;
 	if (send(sockfd, msg.c_str(), msg.length(), 0) < 0)
 		throw (std::runtime_error("\033[1;91mError while sending message\033[0m"));
 }
-
+void			Server::joinZero(Client &c)
+{
+	std::map<std::string,Channel*>::iterator it  = _channels.begin();
+	while (it != _channels.end())
+	{
+		if(it->second->checkIfIsClientNickName(c.getNickname()))
+		{
+			PART("PART "+it->first+" :Sorry\r\n",c);
+		}
+		it++;
+	}
+	
+}
 void	Server::launch()
 {
 	pollfd fd_server = {_sock, POLLIN, 0};
@@ -437,8 +482,9 @@ void	Client::welcome()
 		return ;
 	}
 	state = REGISTERED;
-	reply(REPLY_WELCOME(nick,host));
+	reply(REPLY_WELCOME(nick,username,host));
 	reply(REPLY_YOURHOST(nick,host));
+	// reply(REPLY_CREATED(nick,host,getTimeSc()));
 	// reply(REPLY_CREATED(nick,host,getStartTimestp()));
 	
 	std::cout << B_CYAN << nick << " is registered" << RESET << std::endl;
@@ -508,7 +554,10 @@ int     Server::checkIfChannelExist(std::string &target)
 	// return NULL;
 	return 0;
 }
-
+void    Channel::removeClientNickName(std::string const &nickname)
+{
+	this->client.erase(nickname);
+}
 // void	Server::set_Channel(Channel const &ch)
 // {
 // 	_channels.push_back(ch);
@@ -516,17 +565,46 @@ int     Server::checkIfChannelExist(std::string &target)
 /////client 
 
 ////
+std::string getTimeSc()
+{
+        // Check if creatchannelTime is valid
+		time_t		creatchannelTime;
+		std::stringstream		ss;
+		time(&creatchannelTime);
+        // if (creatchannelTime == -1) {
+        //     return "Error: Invalid time value";
+        // }
+
+        // // Convert to UTC using gmtime()
+		// // std::cout <<"ok ss  "<< creatchannelTime<<std::endl;
+        // struct tm* gmTime = gmtime(&creatchannelTime);
+        // if (gmTime == NULL) {
+        //     return "Error: Failed to convert to UTC";
+        // }
+        // // Format the time to YYYY-MM-DD HH:MM:SS
+        // char buffer[30];
+        // strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmTime);
+
+        // // Append milliseconds as ".000"
+        // std::string result(buffer);
+    	// result += ".000";
+		// // std::stringstream ss;
+		ss << creatchannelTime;
+
+    return ss.str();
+
+}
+
 Channel::Channel(std::string _name,std::string _password):name(_name),password(_password)
 {
 	// mode = 0;
 	isKey = password.size() == 0 ? false : true;
-	isPrivatChannel = false;
 	isInviteOnly = false;
-	std::ostringstream oss;
-    oss << time(NULL);
-    timeSc = oss.str();
+	isTopic = false;
+    timeScCh = getTimeSc();
 	mode.insert('t');
 	islimit = false;
+	chTopicOp = false;
 	topic = "";
 	nbr_client = 0;
 	max_client = -1;
@@ -534,7 +612,39 @@ Channel::Channel(std::string _name,std::string _password):name(_name),password(_
 }
 std::string Channel::getTime()
 {
-	return this->timeSc;
+	return this->timeScCh;
+}
+std::string Channel::getTimeTop()
+{
+	return this->timeScTo;
+}
+int Channel::getModeSize()
+{
+	return this->mode.size();
+}
+void Channel::setIsTopic(bool istopic)
+{
+	this->isTopic = istopic;
+}
+bool Channel::getIsTopic()
+{
+	return this->isTopic;
+}
+void Channel::setChTopOp(bool chtopic)
+{
+	this->chTopicOp = chtopic;
+}
+bool Channel::getChTopOp()
+{
+	return this->chTopicOp;
+}
+void Channel::setTimeTop(std::string const &time)
+{
+			this->timeScTo = time;
+}
+void Channel::setTime(std::string const &time)
+{
+	this->timeScCh = time;
 }
 Channel::~Channel()
 {
@@ -749,7 +859,7 @@ void Channel::addClient(int fd, const std::string& nickname, bool isOperator) {
 		std::map<std::string,std::pair<bool,int> >::iterator v = client.begin();
 		while (v != client.end())
 		{
-			std::cout <<"fd ==="<< v->second.second<<std::endl;
+			// std::cout <<"fd ==="<< v->second.second<<std::endl;
 			v++;
 		}
 		
@@ -806,12 +916,17 @@ void Channel::getMemberOp()
 	// }
 	
 }
-// Client		&Channel::getClientByNickName(std::string Nickname)
-// {
-// 	std::map<std::string,bool>::iterator it = client.find(Nickname);
-// 	if()
-// 	throw("");
-// }
+Client		*Server::getClientByNickNameS(std::string Nickname)
+{
+	std::map<int,Client*>::iterator it = _clients.begin();
+	while (it != _clients.end())
+	{
+		if(it->second->getNickname().compare(Nickname) == 0)
+			return it->second;
+		it++;
+	}
+	return(NULL);
+}
 std::string	Channel::get_list_of_names()
 {
 	std::string	names;
@@ -860,13 +975,26 @@ void Channel::eraseMode(char s)
 {
 	this->mode.erase(s);
 }
-std::string Channel::getMode() const
+std::string Channel::getMode()
 {
 	std::string modeStr = "+";
+	std::string arg = " ";
     for (std::set<char>::const_iterator it = this->mode.begin(); it != this->mode.end(); ++it) {
+		if(*it == 'k')
+		{
+			arg+= this->password;
+			arg+=" ";
+		}
+		else if(*it == 'l')
+		{
+			std::ostringstream oss;
+			oss << this->max_client;
+			arg+=oss.str();
+			arg+=" ";
+		}
         modeStr += *it;
     }
-    return modeStr;
+    return std::string(modeStr + arg);
 }
 bool Channel::hasMode(char mode) const {
     return this->mode.find(mode) != this->mode.end();
