@@ -249,7 +249,7 @@ class Channel
         std::string topic;
         long long max_client;
         long long nbr_client;
-        std::map<Client*,bool> client;////member
+        std::map<std::string,std::pair<bool,int> > client;////member
 		std::vector<Client> invite;
 		std::vector<int> fdClient;
 		std::set<char> mode;
@@ -297,21 +297,21 @@ class Channel
         void setName(std::string &_name);
         void setPassword(std::string &_passord);
         void setTopic(std::string &_topic);
-        void setClientRole(Client &c, bool role);
+        void setClientRole(std::string const &nickname, bool role);
 		void setKey(bool key);
 		void setIsTopic(bool istopic);
 		bool getIsTopic();
 		void setChTopOp(bool istopic);
 		bool getChTopOp();
 		void setClient(std::string const &nickname,bool role);
-		void	addClient(Client &c, bool isOperator);
+		void	addClient(int fd, const std::string& nickname, bool isOperator);
 		// void setMode(char mode);
 		// void disable_mode(mode_t mode);
 		std::string get_list_of_names();
-        int		checkIfIsClientNickName(std::string nickname);
+        int		checkIfIsClientNickName(std::string name);
 		Client	&getClientByNickName(std::string name);
 		// void	sendReplyAllCl(const std::string &msg);
-        int		findClientRole(std::string nickname);
+        int		findClientRole(std::string nikname);
         int		checkIfIsClient(std::string const &nickname);
 		int		checkIfIsInvite(const Client &c);
         // void    ft_add_to_channel(Client &c,std::string pass);
