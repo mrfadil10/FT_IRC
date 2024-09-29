@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/09/29 23:00:11 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/29 23:29:50 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -810,25 +810,24 @@ void Channel::setLimit(bool l)
 // {
 // 	mode.insert(c);
 // }
-void    Channel::setClientRole(std::string const &nickname, bool role)
+void    Channel::setClientRole(Client &c, bool role)
 {
-    std::map<std::string,std::pair<bool,int> >::iterator v = client.find(nickname);
-	v->second.first = role;
+    client[&c] = role;
 }
-int Channel::checkIfIsInvite(const Client &c)
-{
-    std::vector<Client>::iterator v = std::find(invite.begin(),invite.end(),c);
-    if(v != invite.end())
-        return 1;
-    return 0;
-}
-int Channel::checkIfIsClient(std::string const &nickname)
-{
-    // std::map<Client*,bool>::iterator v = std::find(client.begin(),client.end(),c);
-	if(client.find(nickname) != client.end())
-        return 1;
-    return 0;
-}
+// int Channel::checkIfIsInvite(const Client &c)
+// {
+//     std::vector<Client>::iterator v = std::find(invite.begin(),invite.end(),c);
+//     if(v != invite.end())
+//         return 1;
+//     return 0;
+// }
+// int Channel::checkIfIsClient(std::string const &nickname)
+// {
+//     // std::map<Client*,bool>::iterator v = std::find(client.begin(),client.end(),c);
+// 	if(client.find(nickname) != client.end())`
+//         return 1;
+//     return 0;
+// }
 // void Channel::allClientInChannel()
 // {
 // 	std::map<Client *,bool>::iterator it = client.begin();
@@ -841,16 +840,13 @@ int Channel::checkIfIsClient(std::string const &nickname)
 // }
 int Channel::checkIfIsClientNickName(std::string name)
 {
-    std::map<std::string,std::pair<bool,int> >::iterator v = client.find(name);
-	if(v != client.end())
-		return 1;
-    return 0;
-}
-int Channel::findClientRole(std::string nikname)
-{
-    std::map<std::string,std::pair<bool,int> >::iterator v = client.find(nikname);
-	if(v != client.end())
-		return v->second.first;
+    std::map<Client*,bool>::iterator v = client.begin();
+	while (v != client.end())
+	{
+		if(v->first->getNickname().compare(name) == 0)
+			return 1;
+		v++;
+	}
     return 0;
 }
 
@@ -930,13 +926,13 @@ Client		*Server::getClientByNickNameS(std::string Nickname)
 std::string	Channel::get_list_of_names()
 {
 	std::string	names;
-	std::map<std::string,std::pair<bool,int> >::iterator itr = client.begin();
+	std::map<Client*,bool>::iterator itr = client.begin();
 	while (itr != client.end())
 	{
-		if (itr->second.first)
-			names += "@" + itr->first + " ";
+		if (itr->second)
+			names += "@" + itr->first->getNickname() + " ";
 		else
-			names += itr->first + " ";
+			names += itr->first->getNickname() + " ";
 		itr++;
 	}
 	return names;
@@ -951,12 +947,12 @@ void	Channel::setFdClien(int fd)
 }
 void	Channel::sendReplyAll(const std::string &msg,std::string nickname)
 {
-		std::map<std::string,std::pair<bool,int> >::iterator it = client.begin();
+		std::map<Client*,bool>::iterator it = client.begin();
 		while (it != client.end())
 		{
-			if (it->first.compare(nickname) != 0)
+			if (it->first->getNickname().compare(nickname) != 0)
 			{
-				if(send(it->second.second, msg.c_str(), msg.length(), 0) < 0)
+				if(send(it->first->getFd(), msg.c_str(), msg.length(), 0) < 0)
 					throw std::runtime_error("\033[1;91mError send.\033[0m");
 			}
 			it++;
