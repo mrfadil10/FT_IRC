@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/09/30 00:06:45 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/30 18:31:17 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -611,6 +611,11 @@ Channel::Channel(std::string _name,std::string _password):name(_name),password(_
 	max_client = -1;
 	
 }
+
+void	Channel::addIviteClient(int fd, const std::string& nickname)
+{
+	this->invite[nickname] = fd;
+}
 std::string Channel::getTime()
 {
 	return this->timeScCh;
@@ -693,45 +698,45 @@ Channel::Channel(const Channel &c)
 {
     *this  = c;
 }
-std::string Client::getStartTimestp() const {
-    std::stringstream ss;
-    ss << this->creatServerTime;
-	struct tm timeinfo;
-    memset(&timeinfo, 0, sizeof(struct tm));
+// std::string Client::getStartTimestp() const {
+//     std::stringstream ss;
+//     ss << this->creatServerTime;
+// 	struct tm timeinfo;
+//     memset(&timeinfo, 0, sizeof(struct tm));
 
-    // Parse the input string
-    if (sscanf(ss.str().c_str(), "%d-%d-%d %d:%d:%d",
-               &timeinfo.tm_year, &timeinfo.tm_mon, &timeinfo.tm_mday,
-               &timeinfo.tm_hour, &timeinfo.tm_min, &timeinfo.tm_sec) != 6) {
-        return "Error: Invalid time format";
-    }
+//     // Parse the input string
+//     if (sscanf(ss.str().c_str(), "%d-%d-%d %d:%d:%d",
+//                &timeinfo.tm_year, &timeinfo.tm_mon, &timeinfo.tm_mday,
+//                &timeinfo.tm_hour, &timeinfo.tm_min, &timeinfo.tm_sec) != 6) {
+//         return "Error: Invalid time format";
+//     }
 
-    // Adjust the parsed values
-    timeinfo.tm_year -= 1900;  // Year is years since 1900
-    timeinfo.tm_mon -= 1;      // Month is 0-11
+//     // Adjust the parsed values
+//     timeinfo.tm_year -= 1900;  // Year is years since 1900
+//     timeinfo.tm_mon -= 1;      // Month is 0-11
 
-    // Convert to time_t
-    time_t rawtime = mktime(&timeinfo);
-    if (rawtime == -1) {
-        return "Error: Failed to convert time";
-    }
+//     // Convert to time_t
+//     time_t rawtime = mktime(&timeinfo);
+//     if (rawtime == -1) {
+//         return "Error: Failed to convert time";
+//     }
 
-    // Convert to UTC
-    struct tm* gmTime = gmtime(&rawtime);
-    if (gmTime == NULL) {
-        return "Error: Failed to convert to UTC";
-    }
+//     // Convert to UTC
+//     struct tm* gmTime = gmtime(&rawtime);
+//     if (gmTime == NULL) {
+//         return "Error: Failed to convert to UTC";
+//     }
 
-    // Format for IRC server time
-    char buffer[30];
-    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmTime);
+//     // Format for IRC server time
+//     char buffer[30];
+//     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmTime);
 
-    // Append ".000" for milliseconds (IRC format)
-    std::string result(buffer);
-    result += ".000";
+//     // Append ".000" for milliseconds (IRC format)
+//     std::string result(buffer);
+//     result += ".000";
 
-    return result;
-}
+//     return result;
+// }
 Channel& Channel::operator=(const Channel& other) {
     if (this != &other) {
 		name = other.name;
@@ -740,10 +745,7 @@ Channel& Channel::operator=(const Channel& other) {
 		client.clear();
 		client.insert(other.client.begin(),other.client.end());
 		invite.clear();
-		for (size_t i = 0; i < other.invite.size(); i++)
-		{
-			invite.push_back(other.invite.at(i));
-		}
+		invite.insert(other.invite.begin(),other.invite.end());
     }
     return *this;
 }
@@ -816,13 +818,13 @@ void    Channel::setClientRole(std::string const &nickname, bool role)
     std::map<std::string,std::pair<bool,int> >::iterator v = client.find(nickname);
 	v->second.first = role;
 }
-int Channel::checkIfIsInvite(const Client &c)
-{
-    std::vector<Client>::iterator v = std::find(invite.begin(),invite.end(),c);
-    if(v != invite.end())
-        return 1;
-    return 0;
-}
+// int Channel::checkIfIsInvite(const Client &c)
+// {
+//     std::map<std::string,int>::iterator v = invite.find(c.getNickname());
+//     if(v != invite.end())
+//         return 1;
+//     return 0;
+// }
 int Channel::checkIfIsClient(std::string const &nickname)
 {
     // std::map<Client*,bool>::iterator v = std::find(client.begin(),client.end(),c);
@@ -893,7 +895,7 @@ void Channel::addClient(int fd, const std::string& nickname, bool isOperator) {
 // }
 int	Channel::checkIfInviteToChannel(Client &c)
 {
-	std::vector<Client>::iterator v = std::find(invite.begin(),invite.end(),c);
+	std::map<std::string,int>::iterator v = invite.find(c.getNickname());
 	if(v != invite.end())
 		return 1;
 	return 0;
@@ -942,14 +944,14 @@ std::string	Channel::get_list_of_names()
 	}
 	return names;
 }
-void	Channel::setFdClien(int fd)
-{
-	this->fdClient.push_back(fd);
-	for (size_t i = 0; i < this->fdClient.size(); i++)
-	{
-		std::cout <<"fd =1===="<< this->fdClient.at(i)<<std::endl;
-	}
-}
+// void	Channel::setFdClien(int fd)
+// {
+// 	this->fdClient.push_back(fd);
+// 	for (size_t i = 0; i < this->fdClient.size(); i++)
+// 	{
+// 		std::cout <<"fd =1===="<< this->fdClient.at(i)<<std::endl;
+// 	}
+// }
 void	Channel::sendReplyAll(const std::string &msg,std::string nickname)
 {
 		std::map<std::string,std::pair<bool,int> >::iterator it = client.begin();

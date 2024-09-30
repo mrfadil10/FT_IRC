@@ -205,7 +205,7 @@ class Client
 		bool operator<(const Client &c)const;
 		bool operator!=(const Client& c)const;
 	// Client functions
-		std::string getStartTimestp() const;
+		// std::string getStartTimestp() const;
 		void	reply(std::string msg);
 		void	welcome();
 
@@ -251,8 +251,7 @@ class Channel
         long long max_client;
         long long nbr_client;
         std::map<std::string,std::pair<bool,int> > client;////member
-		std::vector<Client> invite;
-		std::vector<int> fdClient;
+		std::map<std::string,int> invite;
 		std::set<char> mode;
 		std::string timeScTo;
 		std::string timeScCh;
@@ -268,7 +267,6 @@ class Channel
         Channel(const Channel &c);
 		void	setFdClien(int fd);
         Channel &operator=(const Channel &c);
-		std::vector<int>& getClientFds() { return fdClient; }
 		int getModeSize();
     	// const std::map<std::string, bool>& getClients() const { return client; }
         std::string get_name() const;
@@ -306,6 +304,7 @@ class Channel
 		bool getChTopOp();
 		void setClient(std::string const &nickname,bool role);
 		void	addClient(int fd, const std::string& nickname, bool isOperator);
+		void	addIviteClient(int fd, const std::string& nickname);
 		// void setMode(char mode);
 		// void disable_mode(mode_t mode);
 		std::string get_list_of_names();
@@ -361,7 +360,7 @@ class Server
 	Channel								*getChannel(std::string &target);
 	void			joinZero(Client &c);
 	// Manage Clients
-	std::string						getStartTimestp() const;
+	// std::string						getStartTimestp() const;
 	void							clientDisconnect(int fd);
 	void							eraseClient(int fd);
 	void							newCl();
