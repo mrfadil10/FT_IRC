@@ -37,6 +37,7 @@
 #define I_GREEN		"\033[1;92m"
 #define RESET		"\033[0m"
 
+#define ERR_USERSDONTMATCH(server, nick) ":" + server + " 502 " + nick + " :Cannot change mode for other users\r\n"
 #define ERR_NOTEXTTOSEND(host, nick) ":" + host + " 412 " + nick + " :No text to send\r\n"
 #define RPL_PRIVMSG(nick,username,hostname,target,comment) ":"+nick+"!~"+username+"@"+hostname+" PRIVMSG "+target+" :"+comment+"\r\n"
 #define ERR_NORECIPIENT(host, nick, command) ":" + host + " 411 " + nick + " :No recipient given (" + command + ")\r\n"
@@ -70,7 +71,7 @@
 #define ERR_INVITEONLY(hostname, nick, channelName) ":" + hostname + " 473 " + nick + " " + channelName + " :Cannot join channel, you must be invited (+i)\r\n"
 #define RPL_JOIN_OP(nick, username, channelname, ipaddress) ":@" + nick + "!~" + username + "@" + ipaddress + " JOIN " + channelname + "\r\n"
 #define RPL_TOPICDISPLAY(hostname, nick, channel, topic) ":" + hostname + " 332 " + nick + " " + channel + " :" + topic + "\r\n"
-#define ERR_USERSDONTMATCH(nickname,hostname) ":"+hostname+" "+" 502 "+nickname+" :Cant change mode for other users\r\n"
+// #define ERR_USERSDONTMATCH(nickname,hostname) ":"+hostname+" "+" 502 "+nickname+" :Cant change mode for other users\r\n"
 // #define RPL_CHANNELMODEIS(hostname, nick, channel, modes) ":" + hostname + " 324 " + nick + " " + channel + " " + modes + "\r\n"
 #define RPL_MODEISLIMIT(channel, hostname, mode, newlimit) ":" + hostname + " MODE " + channel + " " + mode + " " + newlimit + "\r\n"
 #define RPL_ALLINV(nickname,hostname) ":"+ hostname +" 665 " + nickname + ": Channel already set in invite-only mode\r\n"
@@ -369,7 +370,7 @@ class Server
 
 	Client							*findClient(int fd);
 	// Client							&findClient(std::string nickname);
-	// int								findClientIn(std::string nickname);
+	int								findClientInS(std::string nickname);
 	std::map<int,Client*>::iterator	findClientIt(int fd);
 
 	// IRC Commands...

@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/09/29 23:42:00 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/30 00:06:45 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -337,15 +337,16 @@ void	Server::parseCmd(std::string str, Client &cl)
 // 	}
 // 	throw (std::out_of_range("\033[1;91mError while searching for user1\033[0m"));
 // }
-// int		Server::findClientIn(std::string nickname)
-// {
-// 	for (unsigned int i = 0; i < _clients.size(); i++)
-// 	{
-// 		if (_clients[i].getNickname() == nickname)
-// 			return (1);
-// 	}
-// 	return 0;
-// }
+int		Server::findClientInS(std::string nickname)
+{
+	std::map<int,Client*>::iterator cl = _clients.begin();
+	while(cl != _clients.end())
+	{
+		if (cl->second->getNickname().compare(nickname) == 0)
+			return (1);
+	}
+	return 0;
+}
 
 Client		*Server::findClient(int fd)
 {

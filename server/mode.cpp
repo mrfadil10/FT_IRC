@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/09/29 23:31:49 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/09/30 18:10:02 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ long long	aatoi(const char * str)
 	while (str[i])
 	{
 		if (std::isalpha(str[i]))
-			return (-1);
+			return (-2);
 		s = (s * 10) + (str[i] - '0');
 		i++;
 	}
@@ -47,7 +47,7 @@ int     invalidMode(std::string mode)
         else if(mode[i] == 'i' || mode[i]=='k' || mode[i] == 't' || mode[i] == 'l'|| mode[i] == 'o')
             flag1 = true;
     }
-    if(flag == true && flag1 == false)
+    if((flag == true && flag1 == true) || flag1 == true)
         return 1;
     return 0;
 }
@@ -111,10 +111,12 @@ int    Server::MODE(std::string cmd, Client &c)
             return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
         if(c.getNickname().compare(target) == 0)
             return c.reply(RPL_UMODEIS(c.getHost(),c.getNickname(),"+Zi")),1;
+        else if(findClientInS(target))
+            return c.reply(ERR_USERSDONTMATCH(c.getNickname(),c.getHost())),1;
         else
             return c.reply(ERR_NOSUCHNICK(c.getHost(),target)),1;
     }
-    if(args.size() == 2 || (args.size() == 3 && invalidMode(args[2]) == 1))
+    if(args.size() == 2 || (args.size() == 3 && !invalidMode(args[2])))
     {
         if(ch->checkIfIsClient(c.getNickname()))
             c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),ch->get_name(),ch->getMode()));
@@ -162,8 +164,8 @@ int    Server::MODE(std::string cmd, Client &c)
             else if(!flag && !ch->getKey())
                 c.reply(ERR_NOKEYSET(c.getHost(),nick,target));
             else if(flag && ch->getKey())
-                continue;
-            else 
+                it++;
+            else
             {
                 if(!flag)
                 {
@@ -175,6 +177,7 @@ int    Server::MODE(std::string cmd, Client &c)
                     if(del_break(*it).find(' ') != std::string::npos)
                     {
                         c.reply(ERROR_INVALIDMODEPARAM__KEY(c.getNickname(),target,c.getHost(),del_break(*it)));
+                        it++;
                         continue;
                     }
                     ch->setPassword(del_break(*it));
@@ -222,6 +225,7 @@ int    Server::MODE(std::string cmd, Client &c)
                     if(aatoi(del_break(*it).c_str()) == -1)
                     {
                         c.reply(ERROR_INVALIDMODEPARAM_LIMIT(target,c.getHost(),del_break(*it)));
+                        it++;
                         continue;
                     }
                     // if(aatoi(del_break(*it).c_str()) == 0)
@@ -235,8 +239,8 @@ int    Server::MODE(std::string cmd, Client &c)
                         ch->setLimit(flag);
                         ch->setMaxClient(aatoi(del_break(*it).c_str()));
                         ch->setMode('l');
+                        m += del_break(*it)+" ";
                     }
-                    m += del_break(*it)+" ";
                     it++;
                 }
                 std::string f = flag == true ? "+":"-";
@@ -254,20 +258,24 @@ int    Server::MODE(std::string cmd, Client &c)
                 c.reply(ERR_NOSUCHNICK(c.getHost(),del_break(*it)));
             else
             {
-                //Client &client = ch->getClientByNickName(del_break(*it));
-                if(ch->findClientRole(del_break(*it)) && flag)
+                if((ch->findClientRole(del_break(*it)) && flag) || (!ch->findClientRole(del_break(*it)) && !flag))
+                {
+                    it++;
                     continue;
-                if(!ch->findClientRole(del_break(*it)) && !flag)
-                    continue;
-                std::string f = flag == true ? "+":"-";
-                as+=f+"o";
-                m += del_break(*it)+" ";
-                ch->setClientRole(del_break(*it),flag);
-                if(flag)
-                    ch->setMode('o');
+                }
                 else
-                    ch->eraseMode('o');
-                it++;
+                {
+                    std::string f = flag == true ? "+":"-";
+                    as+=f+"o";
+                    m += del_break(*it)+" ";
+                    ch->setClientRole(del_break(*it),flag);
+                    if(flag)
+                        ch->setMode('o');
+                    else
+                        ch->eraseMode('o');
+                    it++;
+                }
+                
             }
             
         }else
