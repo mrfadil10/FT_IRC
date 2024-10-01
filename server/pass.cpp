@@ -22,7 +22,7 @@ int		teststring(std::string test)
 
 int Server::cmdPass(std::string arg, Client &cl)
 {
-	std::vector<std::string> pswrd = splitCommands(arg);
+	std::vector<std::string> pswrd = splitCommands(del_break(arg));
 	if (pswrd.size() < 2)
 	{
 		cl.reply(ERROR_NEED_MORE_PARAMETERS(cl, "Password"));

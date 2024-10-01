@@ -36,31 +36,31 @@ int Server::PRIVMSG(std::string cmd, Client& client)
         return(client.reply(ERR_NOTEXTTOSEND(client.getHost(),client.getNickname())),1);
     else
     {
-    str = removeBraces(args[1]);
-    receiver = splitByComa(str);
-    for(size_t i = 0 ; i < receiver.size();i++)
-     {
-          if(receiver.at(i)[0] == '#')
-          {
-            Channel* ch = this->getChannel(receiver.at(i));
-            if(ch == NULL)
-                client.reply(ERR_NOSUCHCHANNEL(client.getHost(), client.getNickname(), receiver.at(i)));
-            else if (ch->checkIfIsClientNickName(client.getNickname()) == 0)
-                client.reply(ERR_CANNOTSENDTOCHAN(client.getHost(), client.getNickname(),receiver.at(i)));
-            else
-                ch->sendReplyAll(RPL_PRIVMSG(client.getNickname(),client.getUsername(),client.getHost(),receiver.at(i),args[2]),client.getNickname());
-          }
-          else
-          {
-            Client *cl = getClientByNickNameS(receiver.at(i));
-            if(!cl)
+        str = removeBraces(args[1]);
+        receiver = splitByComa(str);
+        for(size_t i = 0 ; i < receiver.size();i++)
+        {
+            if(receiver.at(i)[0] == '#')
             {
-                client.reply(ERR_NOSUCHNICK(client.getHost(),receiver.at(i)));
-                continue;
+                Channel* ch = this->getChannel(receiver.at(i));
+                if(ch == NULL)
+                    client.reply(ERR_NOSUCHCHANNEL(client.getHost(), client.getNickname(), receiver.at(i)));
+                else if (ch->checkIfIsClientNickName(client.getNickname()) == 0)
+                    client.reply(ERR_CANNOTSENDTOCHAN(client.getHost(), client.getNickname(),receiver.at(i)));
+                else
+                    ch->sendReplyAll(RPL_PRIVMSG(client.getNickname(),client.getUsername(),client.getHost(),receiver.at(i),args[2]),client.getNickname());
             }
-            cl->reply(RPL_PRIVMSG(client.getNickname(),client.getUsername(),client.getHost(),receiver.at(i),args[2]));
-          }
-     }
+            else
+            {
+                Client *cl = getClientByNickNameS(receiver.at(i));
+                if(!cl)
+                {
+                    client.reply(ERR_NOSUCHNICK(client.getHost(),receiver.at(i)));
+                    continue;
+                }
+                cl->reply(RPL_PRIVMSG(client.getNickname(),client.getUsername(),client.getHost(),receiver.at(i),args[2]));
+            }
+        }
     }
     return(0);
 }

@@ -20,10 +20,10 @@ int    Server::INVITE(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
-    std::vector<std::string> args = splitCommands(del_break(cmd));
+    std::vector<std::string> args = splitCommands(cmd);
     if(args.size() < 3)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"INVIT")),1;
-    std::string target = del_break(args[2]);
+    std::string target = args[2];
     Channel *ch = getChannel(target);
     if(!ch || !ch->get_nbr_client())
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
@@ -31,7 +31,7 @@ int    Server::INVITE(std::string cmd, Client &c)
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
     if(!ch->findClientRole(c.getNickname()) && ch->getInviteOnly())
         return c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target)),1;
-    std::string invite = del_break(args[1]);
+    std::string invite = args[1];
     if(ch->checkIfIsClient(invite))
         return c.reply(ERR_USERONCHANNEL(c.getHost(),invite,target)),1;
     Client *cl = getClientByNickNameS(invite);

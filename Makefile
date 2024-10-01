@@ -14,7 +14,7 @@ SRCS = ./server/server.cpp \
 	   ./server/kick.cpp \
 	   ./server/part.cpp \
 	   ./server/invite.cpp \
-	   ./server/pm.cpp \
+	   ./server/privmsg.cpp \
 	   ./main.cpp
 
 DSYM = ./ircserv.dSYM

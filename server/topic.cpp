@@ -4,7 +4,7 @@
 //     std::string all;
 //     for (size_t i = 2; i < v.size(); i++)
 //     {
-//         all += del_break(v.at(i)) + " ";
+//         all += v.at(i)) + " ";
 //     }
 //     return all;
 // }
@@ -42,10 +42,10 @@ int    Server::TOPIC(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
-    std::vector<std::string> args = splitCommands(del_break(cmd));
+    std::vector<std::string> args = splitCommands(cmd);
     if(args.size() < 2)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"TOPIC")),1;
-    std::string target = del_break(args[1]);
+    std::string target = args[1];
     Channel *ch = getChannel(target);
     if(!ch)
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
@@ -64,7 +64,7 @@ int    Server::TOPIC(std::string cmd, Client &c)
             c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
         else
         {
-            ch->setTopic(del_break(args[2]));
+            ch->setTopic(args[2]);
             ch->setIsTopic(true);
             ch->setTimeTop(getTimeSc());
             c.reply(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()));

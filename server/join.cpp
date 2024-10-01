@@ -12,7 +12,8 @@ std::vector<std::string> splitChannelandKey(std::string msg)
     while (std::getline(str, tm, ','))
 	{
         // std::cout <<"'"<< tm <<"'"<<std::endl;
-		cmd.push_back(del_break(tm));
+        if(!tm.empty())
+		    cmd.push_back(tm);
 	}
 	return (cmd);
 }
@@ -70,16 +71,16 @@ int Server::JOIN(std::string cmd, Client &c)
     std::vector<std::string> args = splitCommands(cmd);
     if (args.size() < 2) 
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"JOIN")),1;
-    if(aatoi(del_break(args[1]).c_str()) == 0)
+    if(!args[1].compare("0"))
         return joinZero(c),1;
-    std::vector<std::string> channels = splitChannelandKey(del_break(args[1]));
+    std::vector<std::string> channels = splitChannelandKey(args[1]);
     std::vector<std::string> key;
     if(args.size() == 3)
-        key = splitChannelandKey(del_break(args[2]));
+        key = splitChannelandKey(args[2]);
     std::string keys = "";
     for (size_t i = 0;i < channels.size();i++)
     {
-        keys = i < key.size() && !key.empty() ? key[i]:"";
+        
         if (channels[i][0] != '#' || channels[i].find(' ') != std::string::npos || channels[i].size() == 1)
         {
             c.reply(ERR_BADCHANNELNAME(c.getNickname(),c.getHost(),channels[i]));
@@ -87,7 +88,7 @@ int Server::JOIN(std::string cmd, Client &c)
         }
         if (!checkIfChannelExist(channels[i]))
         {
-            Channel *ch = new Channel(channels[i], keys);
+            Channel *ch = new Channel(channels[i]);
             ch->addClient(c.getFd(),c.getNickname(),true);
             _channels[channels[i]] = ch;
             c.reply(RPL_NOTOPIC(c.getHost(),c.getNickname(),channels[i]));
@@ -97,13 +98,14 @@ int Server::JOIN(std::string cmd, Client &c)
         }else
         {
             Channel *cn = getChannel(channels[i]);
+            keys = i < key.size() && !key.empty() ? key[i]:"";
             if(cn->checkIfIsClientNickName(c.getNickname()))
                 c.reply(ERR_USERONCHANNEL(c.getHost(),c.getNickname(),channels[i]));
-            else if(cn->getInviteOnly() && !cn->checkIfInviteToChannel(c))
-                c.reply(ERR_INVITEONLY(c.getHost(),c.getNickname(),channels[i]));
             else if(cn->getLimit() && cn->get_max_client() <= cn->get_nbr_client())
                 c.reply(ERR_CHANNELISFULL(c.getHost(),c.getNickname(),channels[i]));
-            else if(cn->getKey() && cn->get_password().compare(keys) != 0)
+            else if(cn->getInviteOnly() && !cn->checkIfInviteToChannel(c))
+                c.reply(ERR_INVITEONLY(c.getHost(),c.getNickname(),channels[i]));
+            else if(cn->getKey() && cn->get_password().compare(keys) != 0 && !cn->checkIfInviteToChannel(c))
                 c.reply(ERR_BADCHANNELKEY(c.getNickname(),c.getHost(),channels[i]));
             else 
             {

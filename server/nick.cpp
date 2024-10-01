@@ -39,12 +39,12 @@ std::string	ERRMSG_EMPTY(Client cl)
 
 std::string	NICK_ERR(Client cl, std::string newNick)
 {
-	return ("\033[1;91m" + cl.getNickname() + " " + newNick + " :Error in nickname\033[0m");
+	return ("\033[1;91m" + cl.getNickname() + " " + newNick + " :Error in nickname\033[0m\r\n");
 }
 
 std::string	ERRMSG_ALREADYUSED(Client cl, std::string newNick)
 {
-	return ("\033[1;91m" + cl.getNickname() + " " + newNick + " :Nickname already used\033[0m");
+	return ("\033[1;91m" + cl.getNickname() + " " + newNick + " :Nickname already used\033[0m\r\n");
 }
 
 std::string NICK_SUCCESS(std::string newNick)
@@ -56,7 +56,7 @@ int Server::cmdNick(std::string cmd, Client& client)
 {
 	std::vector<std::string> args = splitCommands(cmd);
 	if (args.size() < 2) return (client.reply(ERRMSG_EMPTY(client)), -1);
-	std::string requestedNick = del_break(args[1]);
+	std::string requestedNick = args[1];
 	std::string oldnick = client.getNickname().empty() ? client.getNickname() : "";
 	if (!is_valid_nick(requestedNick))
 		return (client.reply(NICK_ERR(client, requestedNick)), -1);

@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:48:53 by mfadil            #+#    #+#             */
-/*   Updated: 2024/09/25 21:34:01 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/01 17:42:05 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	Server::cmdUser(std::string cmds, Client &cl)
 {
-	std::vector<std::string> args = splitCommands(cmds);
+	std::vector<std::string> args = splitCommands(del_break(cmds));
 	for (size_t i = 0; i < args.size(); i++)
     {
         std::cout << "'"+args.at(i)+"'\n";

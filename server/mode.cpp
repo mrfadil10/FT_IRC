@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/09/30 18:10:02 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/01 18:58:46 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,12 +98,13 @@ std::string makeMode(std::string modeStr)
 }
 int    Server::MODE(std::string cmd, Client &c)
 {
+    std::cout << cmd <<std::endl;
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
     std::vector<std::string> args = splitCommands(cmd);
     if(args.size() == 1)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"MODE #channel +-iotkl xx")),1;
-    std::string target = del_break(args[1]);
+    std::string target = args[1];
     Channel *   ch = getChannel(target);
     if(!ch)
     {
@@ -125,7 +126,7 @@ int    Server::MODE(std::string cmd, Client &c)
         c.reply(RPL_CREATIONTIME(c.getHost(),c.getNickname(),ch->get_name(),ch->getTime()));
         return 1;
     }
-    std::string mode = del_break(args[2]);
+    std::string mode = args[2];
     std::string as,m;
     bool flag  = true;
     if(ch->checkIfIsClientNickName(c.getNickname()) == 0)
@@ -174,15 +175,15 @@ int    Server::MODE(std::string cmd, Client &c)
                 }
                 else 
                 {
-                    if(del_break(*it).find(' ') != std::string::npos)
+                    if(it->find(' ') != std::string::npos)
                     {
-                        c.reply(ERROR_INVALIDMODEPARAM__KEY(c.getNickname(),target,c.getHost(),del_break(*it)));
+                        c.reply(ERROR_INVALIDMODEPARAM__KEY(c.getNickname(),target,c.getHost(),*it));
                         it++;
                         continue;
                     }
-                    ch->setPassword(del_break(*it));
+                    ch->setPassword(*it);
                     ch->setKey(flag);
-                    m += del_break(*it)+" ";
+                    m += *it+" ";
                     ch->setMode('k');
                     it++;
                 }
@@ -222,13 +223,13 @@ int    Server::MODE(std::string cmd, Client &c)
                 }
                 else
                 {
-                    if(aatoi(del_break(*it).c_str()) == -1)
+                    if(aatoi(it->c_str()) == -1)
                     {
-                        c.reply(ERROR_INVALIDMODEPARAM_LIMIT(target,c.getHost(),del_break(*it)));
+                        c.reply(ERROR_INVALIDMODEPARAM_LIMIT(target,c.getHost(),*it));
                         it++;
                         continue;
                     }
-                    // if(aatoi(del_break(*it).c_str()) == 0)
+                    // if(aatoi(*it).c_str()) == 0)
                     // {
                     //     ch->setLimit(false);
                     //     ch->setMaxClient(0);
@@ -237,9 +238,9 @@ int    Server::MODE(std::string cmd, Client &c)
                     else
                     {
                         ch->setLimit(flag);
-                        ch->setMaxClient(aatoi(del_break(*it).c_str()));
+                        ch->setMaxClient(aatoi(it->c_str()));
                         ch->setMode('l');
-                        m += del_break(*it)+" ";
+                        m += *it+" ";
                     }
                     it++;
                 }
@@ -254,11 +255,11 @@ int    Server::MODE(std::string cmd, Client &c)
                 c.reply(ERROR_INVALIDMODEPARAM_OP(target,c.getHost()));
             else if(ch->findClientRole(c.getNickname()) != 1)
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
-            else if(ch->checkIfIsClientNickName(del_break(*it)) == 0)
-                c.reply(ERR_NOSUCHNICK(c.getHost(),del_break(*it)));
+            else if(ch->checkIfIsClientNickName(*it) == 0)
+                c.reply(ERR_NOSUCHNICK(c.getHost(),*it));
             else
             {
-                if((ch->findClientRole(del_break(*it)) && flag) || (!ch->findClientRole(del_break(*it)) && !flag))
+                if((ch->findClientRole(*it) && flag) || (!ch->findClientRole(*it) && !flag))
                 {
                     it++;
                     continue;
@@ -267,8 +268,8 @@ int    Server::MODE(std::string cmd, Client &c)
                 {
                     std::string f = flag == true ? "+":"-";
                     as+=f+"o";
-                    m += del_break(*it)+" ";
-                    ch->setClientRole(del_break(*it),flag);
+                    m += *it+" ";
+                    ch->setClientRole(*it,flag);
                     if(flag)
                         ch->setMode('o');
                     else

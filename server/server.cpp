@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/09/30 18:31:17 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/01 22:01:29 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,57 +275,39 @@ void	Server::handleMessage(int fd)
 		std::cerr << e.what() << '\n';
 		return ;
 	}
-	std::vector<std::string> v = splitCommands(this->_cmd); 
-	for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
-		parseCmd(*it, *findClient(fd));
-	displayClient();
+	try
+	{
+		std::vector<std::string> v = splitCommands(del_break(this->_cmd)); 
+		// for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
+		parseCmd(v.at(0), *findClient(fd));
+		displayClient();
+	}
+	catch(const std::exception& e)
+	{
+		_clients[fd]->reply("->");
+	}
 }
 
 void	Server::parseCmd(std::string str, Client &cl)
 {
-	std::string	tmp;
-	std::vector<std::string> args;
-	std::stringstream	ss(str);
-	std::getline(ss, tmp, ' ');
-	// std::cout <<ss.str()+"      "<< tmp<<std::endl;
-	args.push_back(tmp);
-	// std::cout << "Parse command : [" << tmp << "]" << std::endl;
-
-	std::string cmds[15] = {"PASS", "NICK", "USER", "JOIN","MODE", "TOPIC", "KICK", "PART", "INVITE", "PRIVMSG", "LIST", "NAMES", "TOPIC", "KICK", "NOTICE"};
-	//std::string cmds[15] = {"pass", "nick", "user", "join","mode", "topic", "kick", "KILL", "PING", "PART", "LIST", "NAMES", "TOPIC", "KICK", "NOTICE"};
-
-	int		(Server::*ptr[15])(std::string cmd, Client &cl) = {
-			&Server::cmdPass,
-			&Server::cmdNick,
-			&Server::cmdUser,
-			&Server::JOIN,
-			&Server::MODE,
-			&Server::TOPIC,
-			&Server::KICK,
-			&Server::PART,
-			&Server::INVITE,
-			&Server::PRIVMSG,
-			// &Server::OperCmd,
-			// &Server::PrivMsgCmd,
-			// &Server::KillCmd,
-			// &Server::PingCmd,
-			// &Server::PartCmd,
-			// &Server::ListCmd,
-			// &Server::NamesCmd,
-			// &Server::TopicCmd,
-			// &Server::KickCmd,
-			// &Server::NoticeCmd,
-	};
-	for (int i = 0; i <= 14; ++i)
-	{
-		if (tmp == cmds[i])
-		{
-			while (std::getline(ss, tmp, ' '))
-				args.push_back(tmp);
-			(this->*ptr[i])(this->_cmd, cl);
-			return ;
-		}
-	}
+    std::map<std::string, int (Server::*)(std::string, Client &)> cmdMap;
+	cmdMap["PASS"]    = &Server::cmdPass;
+    cmdMap["NICK"]    = &Server::cmdNick;
+    cmdMap["USER"]    = &Server::cmdUser;
+    cmdMap["JOIN"]    = &Server::JOIN;
+    cmdMap["MODE"]    = &Server::MODE;
+    cmdMap["TOPIC"]   = &Server::TOPIC;
+    cmdMap["KICK"]    = &Server::KICK;
+    cmdMap["PART"]    = &Server::PART;
+    cmdMap["INVITE"]  = &Server::INVITE;
+    cmdMap["PRIVMSG"] = &Server::PRIVMSG;
+	
+    std::map<std::string, int (Server::*)(std::string, Client &)>::iterator it = cmdMap.find(str);
+    if (it != cmdMap.end()) {
+        (this->*(it->second))(del_break(_cmd), cl);
+    } else {
+        cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
+    }
 }
 
 // Client		&Server::findClient(std::string nickname)
@@ -438,7 +420,7 @@ void			Server::joinZero(Client &c)
 	{
 		if(it->second->checkIfIsClientNickName(c.getNickname()))
 		{
-			PART("PART "+it->first+" :Sorry\r\n",c);
+			PART("PART "+it->first+" :Sorry",c);
 		}
 		it++;
 	}
@@ -596,10 +578,10 @@ std::string getTimeSc()
 
 }
 
-Channel::Channel(std::string _name,std::string _password):name(_name),password(_password)
+Channel::Channel(std::string _name):name(_name)
 {
 	// mode = 0;
-	isKey = password.size() == 0 ? false : true;
+	isKey = false;
 	isInviteOnly = false;
 	isTopic = false;
     timeScCh = getTimeSc();
@@ -607,7 +589,6 @@ Channel::Channel(std::string _name,std::string _password):name(_name),password(_
 	islimit = false;
 	chTopicOp = false;
 	topic = "";
-	nbr_client = 0;
 	max_client = -1;
 	
 }
@@ -859,13 +840,6 @@ int Channel::findClientRole(std::string nikname)
 
 void Channel::addClient(int fd, const std::string& nickname, bool isOperator) {
         client[nickname] = std::pair<bool,int>(isOperator,fd);
-		std::map<std::string,std::pair<bool,int> >::iterator v = client.begin();
-		while (v != client.end())
-		{
-			// std::cout <<"fd ==="<< v->second.second<<std::endl;
-			v++;
-		}
-		
     }
 // void    Channel::inviteChannel(Client &c,std::string pass)
 // {

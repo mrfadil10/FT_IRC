@@ -249,7 +249,6 @@ class Channel
         std::string password;
         std::string topic;
         long long max_client;
-        long long nbr_client;
         std::map<std::string,std::pair<bool,int> > client;////member
 		std::map<std::string,int> invite;
 		std::set<char> mode;
@@ -262,7 +261,7 @@ class Channel
 		bool isTopic;
 		bool chTopicOp;
     public:
-        Channel(std::string _name,std::string _password);
+        Channel(std::string _name);
         ~Channel();
         Channel(const Channel &c);
 		void	setFdClien(int fd);
@@ -305,21 +304,17 @@ class Channel
 		void setClient(std::string const &nickname,bool role);
 		void	addClient(int fd, const std::string& nickname, bool isOperator);
 		void	addIviteClient(int fd, const std::string& nickname);
-		// void setMode(char mode);
-		// void disable_mode(mode_t mode);
 		std::string get_list_of_names();
         int		checkIfIsClientNickName(std::string name);
 		Client	&getClientByNickName(std::string name);
-		// void	sendReplyAllCl(const std::string &msg);
         int		findClientRole(std::string nikname);
         int		checkIfIsClient(std::string const &nickname);
 		int		checkIfIsInvite(const Client &c);
-        // void    ft_add_to_channel(Client &c,std::string pass);
         void    removeClientNickName(std::string const &nickname);
 		int		checkIfInviteToChannel(Client &c);
 		void    inviteChannel(Client &c,std::string pass);
 		void	addMember(std::string const &name);
-		void		sendReplyAll(const std::string &msg, std::string nickname);
+		void	sendReplyAll(const std::string &msg, std::string nickname);
 };
 
 class Server
@@ -348,19 +343,10 @@ class Server
 	std::vector<std::string> 			splitChannel(std::string msg);
 	std::string							readMessage(int fd);
 	Client								*getClientByNickNameS(std::string Nickname);
-	// std::vector<Client>::iterator getClientFds()
-	// {
-	// 	std::vector<Client>::iterator it = this->_clients.begin();
-	// 	return it;
-	// }
-	// void							getAllChannelAddByClient(Client &c,std::string oldnick,std::string newnick);
-	//manger Channel 
 	void								set_Channel(Channel const &ch);
 	int									checkIfChannelExist(std::string &target);
 	Channel								*getChannel(std::string &target);
 	void			joinZero(Client &c);
-	// Manage Clients
-	// std::string						getStartTimestp() const;
 	void							clientDisconnect(int fd);
 	void							eraseClient(int fd);
 	void							newCl();
@@ -368,7 +354,6 @@ class Server
 	bool							is_used(Client cl, std::string name);
 
 	Client							*findClient(int fd);
-	// Client							&findClient(std::string nickname);
 	int								findClientInS(std::string nickname);
 	std::map<int,Client*>::iterator	findClientIt(int fd);
 
@@ -378,11 +363,11 @@ class Server
 	int		TOPIC(std::string args, Client &c);
 	int		KICK(std::string args, Client &c);
 	int		INVITE(std::string args, Client &c);
-	int    PART(std::string cmd, Client &c);
+	int		PART(std::string cmd, Client &c);
+	int 	PRIVMSG(std::string args, Client& client);
 	int cmdUser(std::string args, Client &cl);
 	int cmdNick(std::string args, Client &cl);
 	int cmdPass(std::string args, Client &cl);
-	int PRIVMSG(std::string args, Client& client);
 	
 };
 

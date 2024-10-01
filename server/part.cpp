@@ -12,9 +12,8 @@ std::vector<std::string> splitChannelA(std::string msg)
 		return (cmd);
     while (std::getline(str, tm, ','))
 	{
-        if (tm.empty())
-		    return (cmd);
-		cmd.push_back(del_break(tm));
+        if (!tm.empty())
+		    cmd.push_back(tm);
 	}
 	return (cmd);
 }
@@ -22,11 +21,11 @@ int    Server::PART(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
-    std::vector<std::string> args = splitCommands(del_break(cmd));
+    std::vector<std::string> args = splitCommands(cmd);
     if(args.size() < 3)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"PART")),1;
-    std::string reason = del_break(args[2]);
-    std::vector<std::string> vec = splitChannelA(del_break(args[1]));
+    std::string reason = args[2];
+    std::vector<std::string> vec = splitChannelA(args[1]);
     for (size_t i = 0; i < vec.size(); i++)
     {
         Channel *ch = getChannel(vec.at(i));

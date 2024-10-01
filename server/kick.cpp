@@ -14,7 +14,7 @@ std::vector<std::string> splitNickName(std::string msg)
 	{
         if (tm.empty())
 		    return (cmd);
-		cmd.push_back(del_break(tm));
+		cmd.push_back(tm);
 	}
 	return (cmd);
 }
@@ -22,10 +22,10 @@ int    Server::KICK(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
-    std::vector<std::string> args = splitCommands(del_break(cmd));
+    std::vector<std::string> args = splitCommands(cmd);
     if(args.size() < 3)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"KCIK")),1;
-    std::string target = del_break(args[1]);
+    std::string target = args[1];
     Channel *ch = getChannel(target);
     if(!ch)
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
@@ -33,8 +33,8 @@ int    Server::KICK(std::string cmd, Client &c)
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
     if(!ch->findClientRole(c.getNickname()))
         return c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target)),1;
-    std::vector<std::string> vec = splitNickName(del_break(args[2]));
-    std::string reason = args.size() >= 4 ? del_break(args[3]) : "";
+    std::vector<std::string> vec = splitNickName(args[2]);
+    std::string reason = args.size() >= 4 ? args[3] : "";
     for(size_t i = 0;i < vec.size();i++)
     {
         if(ch->checkIfIsClient(c.getNickname()) == 0)
