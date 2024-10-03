@@ -1,42 +1,4 @@
 #include "../includes/irc.hpp"
-// std::string joinArg(std::vector<std::string> v)
-// {
-//     std::string all;
-//     for (size_t i = 2; i < v.size(); i++)
-//     {
-//         all += v.at(i)) + " ";
-//     }
-//     return all;
-// }
-// std::vector<std::string> splitTopicCommand(const std::string& input) {
-//     std::vector<std::string> cmd;
-//     std::istringstream iss(input);
-//     std::string part;
-//     std::string command, channel;
-
-//     if (std::getline(iss, part, ' ')) {
-//         command = part;
-//     }
-//     if (std::getline(iss, part, ' ')) {
-//         channel = part;
-//     }
-
-//     std::string topic;
-//     std::getline(iss, topic);
-
-//     size_t colonPos = topic.find(':');
-//     if (colonPos != std::string::npos) {
-//         topic = topic.substr(colonPos + 1);
-//     }
-//     if(!command.empty())
-//         cmd.push_back(command);
-//     if(!channel.empty())
-//         cmd.push_back(channel);
-//     if(!topic.empty())
-//         cmd.push_back(topic);
-
-//     return cmd;
-// }
 
 int    Server::TOPIC(std::string cmd, Client &c)
 {

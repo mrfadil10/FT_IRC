@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/03 17:55:28 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/03 22:58:59 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,10 @@ long long	aatoi(const char * str)
 		if (std::isalpha(str[i]))
 			return (-2);
 		s = (s * 10) + (str[i] - '0');
+        s = s > INT_MAX ? INT_MAX : s;
 		i++;
 	}
-    s = s > LONG_MAX ? LONG_MAX : s;
+    
 	return (s);
 }
 int     invalidMode(std::string mode)
@@ -222,7 +223,11 @@ int    Server::MODE(std::string cmd, Client &c)
                 }
                 else
                 {
-                    if(aatoi(it->c_str()) == -1)
+                    if(aatoi(it->c_str()) >= INT_MAX)
+                    {
+                        it++;
+                        continue;
+                    }if(aatoi(it->c_str()) == -1)
                     {
                         c.reply(ERROR_INVALIDMODEPARAM_LIMIT(target,c.getHost(),*it));
                         it++;

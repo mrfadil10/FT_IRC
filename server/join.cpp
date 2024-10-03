@@ -44,7 +44,6 @@ int Server::JOIN(std::string cmd, Client &c)
             Channel *ch = new Channel(channels[i],keys);
             ch->addClient(c.getFd(),c.getNickname(),true);
             _channels[channels[i]] = ch;
-            c.reply(RPL_NOTOPIC(c.getHost(),c.getNickname(),channels[i]));
             c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost()));
             c.reply(RPL_NAMREPLY(c.getHost(),ch->get_list_of_names(),channels[i],c.getNickname()));
             c.reply(RPL_ENDOFNAMES(c.getHost(),c.getNickname(),channels[i]));
@@ -62,11 +61,14 @@ int Server::JOIN(std::string cmd, Client &c)
             else 
             {
                 cn->addClient(c.getFd(),c.getNickname(),false);
+                c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost()));
                 if(cn->getIsTopic())
+                {
                     c.reply(RPL_TOPICDISPLAY(c.getHost(),c.getNickname(),channels[i],cn->getTopic()));
+                    c.reply(REPLY_TOPICWHOTIME(c.getUsername(),cn->getTimeTop(),c.getNickname(),c.getHost(),channels[i]));
+                }
                 else
                     c.reply(RPL_NOTOPIC(c.getHost(),c.getNickname(),channels[i]));
-                c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost()));
                 cn->sendReplyAll(":" + c.getNickname() + "!" + c.getUsername() + "@" + c.getHost() + " JOIN " + channels[i] + "\r\n", c.getNickname());
                 c.reply(RPL_NAMREPLY(c.getHost(),cn->get_list_of_names(),channels[i],c.getNickname()));
                 c.reply(RPL_ENDOFNAMES(c.getHost(),c.getNickname(),channels[i]));

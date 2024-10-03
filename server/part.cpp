@@ -3,9 +3,7 @@
 
 std::vector<std::string> splitChannelA(std::string msg)
 {
-	// int					i = 0;
 	std::vector<std::string>	cmd;
-    // std::cout << msg << std::endl;
 	std::stringstream	str(msg);
 	std::string				tm;
 	if (msg == "\n")
