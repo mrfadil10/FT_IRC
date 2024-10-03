@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/03 01:18:53 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/03 18:19:16 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -939,12 +939,14 @@ void Channel::eraseMode(char s)
 {
 	this->mode.erase(s);
 }
-std::string Channel::getMode()
+std::string Channel::getMode(int i)
 {
 	std::string modeStr = "+";
 	std::string arg = " ";
     for (std::set<char>::const_iterator it = this->mode.begin(); it != this->mode.end(); ++it) {
-		if(*it == 'k')
+		if(*it == 'k' && !i)
+			continue;
+		else if(*it == 'k')
 		{
 			arg+= this->password;
 			arg+=" ";

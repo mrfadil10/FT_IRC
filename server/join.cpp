@@ -11,59 +11,12 @@ std::vector<std::string> splitChannelandKey(std::string msg)
 		return (cmd);
     while (std::getline(str, tm, ','))
 	{
-        // std::cout <<"'"<< tm <<"'"<<std::endl;
         if(!tm.empty())
 		    cmd.push_back(tm);
 	}
 	return (cmd);
 }
 
-std::string getlTime()
-{
-        // Check if creatchannelTime is valid
-		time_t		creatchannelTime;
-		std::stringstream		ss;
-		time(&creatchannelTime);
-        // if (creatchannelTime == -1) {
-        //     return "Error: Invalid time value";
-        // }
-
-        // // Convert to UTC using gmtime()
-		// // std::cout <<"ok ss  "<< creatchannelTime<<std::endl;
-        // struct tm* gmTime = gmtime(&creatchannelTime);
-        // if (gmTime == NULL) {
-        //     return "Error: Failed to convert to UTC";
-        // }
-        // // Format the time to YYYY-MM-DD HH:MM:SS
-        // char buffer[30];
-        // strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmTime);
-
-        // // Append milliseconds as ".000"
-        // std::string result(buffer);
-    	// result += ".000";
-		// // std::stringstream ss;
-		ss << creatchannelTime;
-
-    return ss.str();
-
-}
-
-// void REPLY_A(int a,int b,Client &c,Channel &ch,std::string channels)
-// {
-//     if(b)
-//     {
-//         c.reply(RPL_TOPICDISPLAY(c.getHost(),c.getNickname(),channels,ch.getTopic()));
-//     }else
-//         c.reply(RPL_NOTOPIC(c.getHost(),c.getNickname(),channels));
-// 	c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels,c.getHost(),""));
-//     if(a)
-//     {
-//         ch.sendReplyAll(":" + c.getNickname() + "!" + c.getUsername() + "@" + c.getHost() + " JOIN " + channels + "\r\n", c.getNickname());
-//     }
-// 	c.reply(RPL_NAMREPLY(c.getHost(),ch.get_list_of_names(),channels,c.getNickname()));
-// 	c.reply(RPL_ENDOFNAMES(c.getHost(),c.getNickname(),channels));
-//     // c.reply(RPL_CHANNELMODEIS(c.getNickname(),channels,"+ns"));
-// }
 int Server::JOIN(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
@@ -80,7 +33,7 @@ int Server::JOIN(std::string cmd, Client &c)
     std::string keys;
     for (size_t i = 0;i < channels.size();i++)
     {
-        keys = i < key.size() && !key.empty() ? key[i]:"";
+        keys = i < key.size() && !key[i].empty() && (key[i].find(' ') == std::string::npos)  ? key[i]:"";
         if (channels[i][0] != '#' || channels[i].find(' ') != std::string::npos || channels[i].size() == 1)
         {
             c.reply(ERR_BADCHANNELNAME(c.getNickname(),c.getHost(),channels[i]));
@@ -122,14 +75,3 @@ int Server::JOIN(std::string cmd, Client &c)
     }
     return 0;
 }
-                /////reply 1
-                // c.reply(RPL_NOTOPIC(c.getNickname(),channels[i],c.getHost()));
-			    // c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost(),"+k"));
-			    // c.reply(RPL_NAMREPLY(c.getHost(),ch.get_list_of_names(),channels[i],c.getNickname()));
-			    // c.reply(RPL_ENDOFNAMES(c.getHost(),c.getNickname(),channels[i]));
-                //reply2
-                // c.reply(RPL_NOTOPIC(c.getNickname(),channels[i],c.getHost()));
-                // c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost(),"+k"));
-                // cn.sendReplyAll(":" + c.getNickname() + "!~" + c.getUsername() + "@" + c.getHost() + " JOIN " +channels[i] + "\r\n", c.getNickname());
-                // c.reply(RPL_NAMREPLY(c.getHost(),cn.get_list_of_names(),channels[i],c.getNickname()));
-                // c.reply(RPL_ENDOFNAMES(c.getHost(),c.getNickname(),channels[i]));

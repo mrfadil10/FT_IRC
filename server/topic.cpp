@@ -50,14 +50,16 @@ int    Server::TOPIC(std::string cmd, Client &c)
     if(!ch)
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
     if(ch->checkIfIsClient(c.getNickname()) == 0)
-            return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
+        return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
     if(args.size() == 2)
     {
         if(!ch->getIsTopic())
             c.reply(RPL_NOTOPIC(c.getHost(),c.getNickname(),target));
         else
+        {
             c.reply(RPL_TOPICDISPLAY(c.getHost(),c.getNickname(),target,ch->getTopic()));
-        c.reply(REPLY_TOPICWHOTIME(c.getUsername(),ch->getTimeTop(),c.getNickname(),c.getHost(),target));
+            c.reply(REPLY_TOPICWHOTIME(c.getUsername(),ch->getTimeTop(),c.getNickname(),c.getHost(),target));
+        }
     }else
     {
         if(!ch->findClientRole(c.getNickname()) && ch->getChTopOp())

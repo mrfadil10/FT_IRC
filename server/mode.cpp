@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/03 01:02:58 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/03 17:55:28 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,9 +119,9 @@ int    Server::MODE(std::string cmd, Client &c)
     if(args.size() == 2 || (args.size() == 3 && !invalidMode(args[2])))
     {
         if(ch->checkIfIsClient(c.getNickname()))
-            c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),ch->get_name(),ch->getMode()));
+            c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),ch->get_name(),ch->getMode(1)));
         else
-            c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),ch->get_name(),"+t"));
+            c.reply(RPL_CHANNELMODEIS(c.getHost(),c.getNickname(),ch->get_name(),ch->getMode(0)));
         c.reply(RPL_CREATIONTIME(c.getHost(),c.getNickname(),ch->get_name(),ch->getTime()));
         return 1;
     }

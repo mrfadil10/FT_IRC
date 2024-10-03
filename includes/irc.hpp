@@ -279,7 +279,7 @@ class Channel
 		bool getKey()const;
 		void setMode(char s);
 		void eraseMode(char s);
-		std::string getMode();
+		std::string getMode(int i);
 		bool hasMode(char mode) const;
 		void setTime(std::string const &time);
 		void setTimeTop(std::string const &time);
