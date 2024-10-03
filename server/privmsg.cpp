@@ -55,7 +55,7 @@ int Server::PRIVMSG(std::string cmd, Client& client)
                 Client *cl = getClientByNickNameS(receiver.at(i));
                 if(!cl)
                 {
-                    client.reply(ERR_NOSUCHNICK(client.getHost(),receiver.at(i)));
+                    client.reply(ERR_NOSUCHNICK(client.getHost(),client.getNickname(),receiver.at(i)));
                     continue;
                 }
                 cl->reply(RPL_PRIVMSG(client.getNickname(),client.getUsername(),client.getHost(),receiver.at(i),args[2]));

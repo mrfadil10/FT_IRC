@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/01 22:01:29 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/03 01:02:29 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,37 +185,21 @@ void	Server::clientDisconnect(int fd)
 
 std::vector<std::string> Server::splitCommands(std::string msg)
 {
-
-	// std::vector<std::string>	cmd;
-	// std::stringstream	str(msg);
-	// std::string				tm;
-	// if (msg == "\n")
-	// 	return (cmd);
-	// while (std::getline(str, tm, '\n'))
-	// {
-	// 	cmd.push_back(tm);
-
-	// }
-	// return (cmd);
     std::vector<std::string> cmd;
     std::string part;
     std::istringstream iss(msg);
-	
+
     while (std::getline(iss, part, ' ')) 
 	{
-        size_t colonPos = part.find(':');
-        if (colonPos != std::string::npos) {
-            if (colonPos > 0) {
-                cmd.push_back(part.substr(0, colonPos));
-            }
-            std::string restOfMessage = part.substr(colonPos + 1);
+		// std::cout << part.find(':') <<std::endl;
+        if (part.find(':')  == 0) 
+		{
+            std::string restOfMessage = part.substr(1,part.size());
             std::string remaining;
-            if (std::getline(iss, remaining)) {
+            if (std::getline(iss, remaining)) 
                 restOfMessage += " " + remaining;
-            }
-			
             cmd.push_back(restOfMessage);
-            return cmd; 
+            return cmd;
         }
 		if(!part.empty())
 			cmd.push_back(part);
@@ -226,11 +210,8 @@ std::vector<std::string> Server::splitCommands(std::string msg)
 std::map<int,Client*>::iterator	Server::findClientIt(int fd)
 {
 	std::map<int,Client*>::iterator ret = _clients.find(fd);
-	// std::vector<Client>::iterator end = _clients.end();
 	if(ret != _clients.end())
-	{
 		return ret;
-	}
 	throw (std::out_of_range("\033[1;91mError while searching for user3\033[0m"));
 }
 
@@ -241,8 +222,6 @@ std::string	Server::readMessage(int fd)
 	bzero(buff, 256);
 	std::map<int,Client*>::iterator cl = findClientIt(fd);
 	msg = cl->second->getMsg();
-	// std::cout << "msg : <" << msg << ">"<< std::endl;
-
 	while (!(std::strstr(buff, "\n")))
 	{
 		int	k = 0;
@@ -326,6 +305,7 @@ int		Server::findClientInS(std::string nickname)
 	{
 		if (cl->second->getNickname().compare(nickname) == 0)
 			return (1);
+		cl++;
 	}
 	return 0;
 }
@@ -347,7 +327,6 @@ Client::Client(int sockfd, std::string hostname) : sockfd(sockfd), host(hostname
 {
 	state = HANDSHAKE;
 	msg = "";
-	creatServerTime = time(NULL);
 }
 
 Client::~Client() {}
@@ -510,11 +489,19 @@ void		Client::setIsInvisible(bool ischeck)
 
 Channel	*Server::getChannel(std::string &target)
 {
+	try
+	{
+		std::map<std::string,Channel*>::iterator i = _channels.find(target);
+		if(i != _channels.end())
+			return i->second;
 
-    std::map<std::string,Channel*>::iterator i = _channels.find(target);
-	if(i != _channels.end())
-		return i->second;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 	return NULL;
+    
 }
 // int comparison(std::string a,std::string b)
 // {
@@ -578,10 +565,10 @@ std::string getTimeSc()
 
 }
 
-Channel::Channel(std::string _name):name(_name)
+Channel::Channel(std::string _name,std::string password):name(_name),password(password)
 {
 	// mode = 0;
-	isKey = false;
+	isKey = password.size() == 0 ? false : true;
 	isInviteOnly = false;
 	isTopic = false;
     timeScCh = getTimeSc();

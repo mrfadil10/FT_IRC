@@ -36,7 +36,7 @@ int    Server::INVITE(std::string cmd, Client &c)
         return c.reply(ERR_USERONCHANNEL(c.getHost(),invite,target)),1;
     Client *cl = getClientByNickNameS(invite);
     if(!cl)
-        return c.reply(ERR_NOSUCHNICK(c.getHost(),invite)),1;
+        return c.reply(ERR_NOSUCHNICK(c.getHost(),c.getNickname(),invite)),1;
     ch->addIviteClient(cl->getFd(),cl->getNickname());
     c.reply(RPL_INVITING(c.getHost(),c.getNickname(),cl->getNickname(),target));
     cl->reply(RPL_INVITE(c.getNickname(),c.getUsername(),c.getHost(),target,cl->getNickname()));

@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/01 18:58:46 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/03 01:02:58 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,25 +98,24 @@ std::string makeMode(std::string modeStr)
 }
 int    Server::MODE(std::string cmd, Client &c)
 {
-    std::cout << cmd <<std::endl;
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
     std::vector<std::string> args = splitCommands(cmd);
     if(args.size() == 1)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"MODE #channel +-iotkl xx")),1;
     std::string target = args[1];
-    Channel *   ch = getChannel(target);
+    Channel *ch = getChannel(target);
     if(!ch)
     {
         if(target[0] == '#')
             return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
         if(c.getNickname().compare(target) == 0)
             return c.reply(RPL_UMODEIS(c.getHost(),c.getNickname(),"+Zi")),1;
-        else if(findClientInS(target))
+        if(getClientByNickNameS(target))
             return c.reply(ERR_USERSDONTMATCH(c.getNickname(),c.getHost())),1;
-        else
-            return c.reply(ERR_NOSUCHNICK(c.getHost(),target)),1;
+        return c.reply(ERR_NOSUCHNICK(c.getHost(),c.getNickname(),target)),1;
     }
+    
     if(args.size() == 2 || (args.size() == 3 && !invalidMode(args[2])))
     {
         if(ch->checkIfIsClient(c.getNickname()))
@@ -142,9 +141,9 @@ int    Server::MODE(std::string cmd, Client &c)
             if(!ch->findClientRole(c.getNickname()))
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
             else if(flag && ch->getInviteOnly())
-                continue;// c.reply(RPL_ALLINV(nick,c.getHost()));
+                continue;
             else if(!flag && !ch->getInviteOnly())
-                continue;//c.reply(RPL_NOTINV(nick,c.getHost()));
+                continue;
             else 
             {
                 std::string f = flag == true ? "+":"-";
@@ -256,7 +255,7 @@ int    Server::MODE(std::string cmd, Client &c)
             else if(ch->findClientRole(c.getNickname()) != 1)
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
             else if(ch->checkIfIsClientNickName(*it) == 0)
-                c.reply(ERR_NOSUCHNICK(c.getHost(),*it));
+                c.reply(ERR_NOSUCHNICK(c.getHost(),c.getNickname(),*it));
             else
             {
                 if((ch->findClientRole(*it) && flag) || (!ch->findClientRole(*it) && !flag))

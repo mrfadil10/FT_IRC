@@ -158,7 +158,7 @@ extern bool g_interrupt;
 // #define RPL_TOPIC(hostname, channel, topic) ":" + hostname + " 332 " + channel + " :" + topic + "\r\n"
 // #define ERR_NOTONCHANNEL(hostname, channel, nick) ":" + hostname + " 442 " + nick + " " + channel + " :You're not on that channel\r\n"
 // #define ERR_NOTEXTTOSEND(hostname) ":" + hostname + " 412 " + ":No text to send\r\n"
-#define ERR_NOSUCHNICK(hostname, nick) ":" + hostname + " 401 " + nick + " :No such nick\r\n"
+#define ERR_NOSUCHNICK(hostname, nick,nick_target) ":" + hostname + " 401 " + nick +" "+nick_target+" :No such nick\r\n"
 
 // #define ERROR_NEEDTOREGISTER(nick, hostname, command) ":" + hostname + " 422 " + nick + " " + command + " :You need to register before you can use that command\r\n"
 // #define ERROR_REALNAME(nick, hostname) ":" + hostname + " 423 " + nick + " :Error in realename !\r\n"
@@ -189,7 +189,6 @@ class Client
 		State			state;
 		bool			_isoper;
 		bool			is_invisible;
-		time_t		creatServerTime;
 		
 		// bool			receives_wallops;
 		// bool			receives_server_notices;
@@ -261,7 +260,7 @@ class Channel
 		bool isTopic;
 		bool chTopicOp;
     public:
-        Channel(std::string _name);
+        Channel(std::string _name,std::string password);
         ~Channel();
         Channel(const Channel &c);
 		void	setFdClien(int fd);
@@ -301,7 +300,7 @@ class Channel
 		bool getIsTopic();
 		void setChTopOp(bool istopic);
 		bool getChTopOp();
-		void setClient(std::string const &nickname,bool role);
+		void	setClient(std::string const &nickname,bool role);
 		void	addClient(int fd, const std::string& nickname, bool isOperator);
 		void	addIviteClient(int fd, const std::string& nickname);
 		std::string get_list_of_names();
@@ -346,7 +345,7 @@ class Server
 	void								set_Channel(Channel const &ch);
 	int									checkIfChannelExist(std::string &target);
 	Channel								*getChannel(std::string &target);
-	void			joinZero(Client &c);
+	void							joinZero(Client &c);
 	void							clientDisconnect(int fd);
 	void							eraseClient(int fd);
 	void							newCl();

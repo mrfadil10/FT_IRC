@@ -75,12 +75,12 @@ int Server::JOIN(std::string cmd, Client &c)
         return joinZero(c),1;
     std::vector<std::string> channels = splitChannelandKey(args[1]);
     std::vector<std::string> key;
-    if(args.size() == 3)
+    if(args.size() >= 3)
         key = splitChannelandKey(args[2]);
-    std::string keys = "";
+    std::string keys;
     for (size_t i = 0;i < channels.size();i++)
     {
-        
+        keys = i < key.size() && !key.empty() ? key[i]:"";
         if (channels[i][0] != '#' || channels[i].find(' ') != std::string::npos || channels[i].size() == 1)
         {
             c.reply(ERR_BADCHANNELNAME(c.getNickname(),c.getHost(),channels[i]));
@@ -88,7 +88,7 @@ int Server::JOIN(std::string cmd, Client &c)
         }
         if (!checkIfChannelExist(channels[i]))
         {
-            Channel *ch = new Channel(channels[i]);
+            Channel *ch = new Channel(channels[i],keys);
             ch->addClient(c.getFd(),c.getNickname(),true);
             _channels[channels[i]] = ch;
             c.reply(RPL_NOTOPIC(c.getHost(),c.getNickname(),channels[i]));
@@ -98,7 +98,6 @@ int Server::JOIN(std::string cmd, Client &c)
         }else
         {
             Channel *cn = getChannel(channels[i]);
-            keys = i < key.size() && !key.empty() ? key[i]:"";
             if(cn->checkIfIsClientNickName(c.getNickname()))
                 c.reply(ERR_USERONCHANNEL(c.getHost(),c.getNickname(),channels[i]));
             else if(cn->getLimit() && cn->get_max_client() <= cn->get_nbr_client())
