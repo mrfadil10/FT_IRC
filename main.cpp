@@ -2,7 +2,7 @@
 
 bool	g_interrupt = false;
 
-std::string	&del_break(std::string& str)
+std::string	del_break(std::string str)
 {
 	if (str.empty())
 		return (str);
@@ -33,7 +33,6 @@ void	signalHandler(int const signal)
 {
 	(void)signal;
 	g_interrupt = true;
-	std::cout << "\b\b";
 }
 
 bool	getport(char *ac, int &port)

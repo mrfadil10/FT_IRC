@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/03 01:02:29 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/03 01:18:53 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,7 +256,7 @@ void	Server::handleMessage(int fd)
 	}
 	try
 	{
-		std::vector<std::string> v = splitCommands(del_break(this->_cmd)); 
+		std::vector<std::string> v = splitCommands(del_break(_cmd));
 		// for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 		parseCmd(v.at(0), *findClient(fd));
 		displayClient();

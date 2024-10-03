@@ -372,7 +372,7 @@ class Server
 
 // utils
 long long	aatoi(const char * str);
-std::string	&del_break(std::string &str);
+std::string	del_break(std::string str);
 std::string	ERROR_NEED_MORE_PARAMETERS(Client &client, std::string cmd);
 std::string getTimeSc();
 #endif
