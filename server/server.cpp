@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/04 17:43:09 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/04 19:03:24 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -569,6 +569,8 @@ Channel::Channel(std::string _name,std::string password):name(_name),password(pa
 {
 	// mode = 0;
 	isKey = password.size() == 0 ? false : true;
+	if(isKey)
+		mode.insert('k');
 	isInviteOnly = false;
 	isTopic = false;
     timeScCh = getTimeSc();
