@@ -22,7 +22,7 @@ int    Server::INVITE(std::string cmd, Client &c)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
     std::vector<std::string> args = splitCommands(cmd);
     if(args.size() < 3)
-        return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"INVIT")),1;
+        return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"INVITE")),1;
     std::string target = args[2];
     Channel *ch = getChannel(target);
     if(!ch || !ch->get_nbr_client())

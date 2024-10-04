@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
+/*   By: eoussama <eoussama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/04 19:03:24 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/04 22:12:47 by eoussama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,7 @@ std::vector<std::string> Server::splitCommands(std::string msg)
 		// std::cout << part.find(':') <<std::endl;
         if (part.find(':')  == 0) 
 		{
-            std::string restOfMessage = part.substr(1,part.size());
+            std::string restOfMessage = part.substr(1,part.size()-1);
             std::string remaining;
             if (std::getline(iss, remaining)) 
                 restOfMessage += " " + remaining;

@@ -1,9 +1,37 @@
 #include "../includes/irc.hpp"
 
+
+std::vector<std::string> Server::splitCommandsT(std::string msg)
+{
+    std::vector<std::string> cmd;
+    std::string part;
+    std::istringstream iss(msg);
+
+    while (std::getline(iss, part, ' ')) 
+	{
+        if (part.find(':')  == 0) 
+		{
+            std::string restOfMessage = part.substr(0,part.size()-1);
+            std::string remaining;
+            if (std::getline(iss, remaining)) 
+                restOfMessage += " " + remaining;
+            cmd.push_back(restOfMessage);
+            return cmd;
+        }                                                                                                                       
+		if(!part.empty())
+			cmd.push_back(part);
+    }
+    return cmd;
+}
+
+
 int    Server::TOPIC(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
+    bool flag;
+    if(cmd.find(':') != std::string::nopos)
+        
     std::vector<std::string> args = splitCommands(cmd);
     if(args.size() < 2)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"TOPIC")),1;
@@ -22,7 +50,8 @@ int    Server::TOPIC(std::string cmd, Client &c)
             c.reply(RPL_TOPICDISPLAY(c.getHost(),c.getNickname(),target,ch->getTopic()));
             c.reply(REPLY_TOPICWHOTIME(c.getUsername(),ch->getTimeTop(),c.getNickname(),c.getHost(),target));
         }
-    }else
+    }
+    else
     {
         if(!ch->findClientRole(c.getNickname()) && ch->getChTopOp())
             c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
