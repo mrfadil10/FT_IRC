@@ -1,15 +1,5 @@
 #include "../includes/irc.hpp"
 
-std::string removeBraces(const std::string& str) {
-    std::string result = str;
-
-    if (!result.empty() && result[0] == '{' && result[result.size() - 1] == '}') {
-        result = result.substr(1, result.size() - 2);
-    }
-
-    return result;
-}
-
 std::vector<std::string> splitByComa(const std::string& str) {
     std::vector<std::string> result;
     std::stringstream ss(str); 
@@ -36,8 +26,7 @@ int Server::PRIVMSG(std::string cmd, Client& client)
         return(client.reply(ERR_NOTEXTTOSEND(client.getHost(),client.getNickname())),1);
     else
     {
-        str = removeBraces(args[1]);
-        receiver = splitByComa(str);
+        receiver = splitByComa(args[1]);
         for(size_t i = 0 ; i < receiver.size();i++)
         {
             if(receiver.at(i)[0] == '#')
