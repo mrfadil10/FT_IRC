@@ -20,9 +20,11 @@ int    Server::PART(std::string cmd, Client &c)
     if(c.getState() != REGISTERED)
         return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
     std::vector<std::string> args = splitCommands(cmd);
-    if(args.size() < 3)
+    if(args.size() < 2)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"PART")),1;
-    std::string reason = args[2];
+    std::string reason = "";
+    if(args.size() >= 3)
+        reason = args[2];
     std::vector<std::string> vec = splitChannelA(args[1]);
     for (size_t i = 0; i < vec.size(); i++)
     {

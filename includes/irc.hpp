@@ -105,7 +105,7 @@ extern bool g_interrupt;
 // #define REPLY_NICKCHANGE(oldNick, nick, hostname) ":" + oldNick + "!~u@" + hostname + " NICK " + nick + "\r\n"
 // #define ERROR_NEEDMOREPARAMS(nick, hostname) (std::string (":") + hostname + std::string(" 461 ") + nick + " :Not enough parameters !\r\n")
 
-#define PART_REPLY(nickname, username, hostname, channel, reason) ":" + nickname + "!~" + username + "@" + hostname + " PART " + channel + " :" + reason + "\r\n"
+#define PART_REPLY(nickname, username, hostname, channel, reason) ":" + nickname + "!~" + username + "@" + hostname + " PART " + channel +" "+ reason + "\r\n"
 
 // #define RPL_AWAY(sender , username, hostname, message , nick_resever) ":" + std::string(sender) + "!~" + std::string(username) + "@" + std::string(hostname) + " PRIVMSG " + nick_resever + " :" + message + "\r\n"
 
@@ -270,6 +270,7 @@ class Channel
         std::string get_name() const;
         std::string get_password() const;
         std::string getTopic() const;
+		void clearInvite();
         long long get_nbr_client() const;
         long long get_max_client() const;
 		std::string getTopicTimestp() const;

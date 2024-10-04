@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/03 18:19:16 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/04 17:43:09 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -579,7 +579,10 @@ Channel::Channel(std::string _name,std::string password):name(_name),password(pa
 	max_client = -1;
 	
 }
-
+void Channel::clearInvite()
+{
+	this->invite.clear();
+}
 void	Channel::addIviteClient(int fd, const std::string& nickname)
 {
 	this->invite[nickname] = fd;

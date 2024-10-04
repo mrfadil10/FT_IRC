@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/03 22:58:59 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/04 17:46:11 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,7 @@ int    Server::MODE(std::string cmd, Client &c)
                 std::string f = flag == true ? "+":"-";
                 as+=f+"i";
                 ch->setInviteOnly(flag);
+                ch->clearInvite();
                 if(flag)
                     ch->setMode('i');
                 else
@@ -158,20 +159,24 @@ int    Server::MODE(std::string cmd, Client &c)
         }
         else if(mode[i] == 'k')
         {
-            if(it == args.end() && flag)
+            if(it == args.end())
                 c.reply("Reply(696): "+target+" k * You must specify a parameter for the key mode. Syntax: <key>.\r\n");
             else if(!ch->findClientRole(c.getNickname()))
                 c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
-            else if(!flag && !ch->getKey())
-                c.reply(ERR_NOKEYSET(c.getHost(),nick,target));
-            else if(flag && ch->getKey())
-                it++;
+            // else if(!flag && !ch->getKey())
+            // {
+            //     // c.reply(ERR_NOKEYSET(c.getHost(),nick,target));
+            //     it++;
+            // }
+            // else if(flag && ch->getKey())
+            //     it++;
             else
             {
                 if(!flag)
                 {
                     ch->setKey(flag);
                     ch->eraseMode('k');
+                    m += "* ";
                 }
                 else 
                 {
@@ -185,8 +190,9 @@ int    Server::MODE(std::string cmd, Client &c)
                     ch->setKey(flag);
                     m += *it+" ";
                     ch->setMode('k');
-                    it++;
+                    
                 }
+                it++;
                 std::string f = flag == true ? "+":"-";
                 as+=f+"k";
             } 
@@ -227,7 +233,7 @@ int    Server::MODE(std::string cmd, Client &c)
                     {
                         it++;
                         continue;
-                    }if(aatoi(it->c_str()) == -1)
+                    }if(aatoi(it->c_str()) <= -1)
                     {
                         c.reply(ERROR_INVALIDMODEPARAM_LIMIT(target,c.getHost(),*it));
                         it++;
@@ -274,10 +280,6 @@ int    Server::MODE(std::string cmd, Client &c)
                     as+=f+"o";
                     m += *it+" ";
                     ch->setClientRole(*it,flag);
-                    if(flag)
-                        ch->setMode('o');
-                    else
-                        ch->eraseMode('o');
                     it++;
                 }
                 
