@@ -60,7 +60,8 @@ int Server::JOIN(std::string cmd, Client &c)
                 c.reply(ERR_BADCHANNELKEY(c.getNickname(),c.getHost(),channels[i]));
             else 
             {
-                cn->addClient(c.getFd(),c.getNickname(),false);
+                bool op = cn->get_nbr_client() == 0 ? true : false;
+                cn->addClient(c.getFd(),c.getNickname(),op);
                 c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost()));
                 if(cn->getIsTopic())
                 {
