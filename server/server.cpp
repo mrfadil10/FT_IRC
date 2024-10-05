@@ -6,7 +6,7 @@
 /*   By: eoussama <eoussama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/04 22:12:47 by eoussama         ###   ########.fr       */
+/*   Updated: 2024/10/04 22:16:39 by eoussama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,26 @@ Server::Server(int port, std::string password) :_port(port), _password(password)
 	
 }
 
-Server::~Server() {}
+// Server::~Server() {
+
+// 	std::map<std::string,Channel*>::iterator it = _channels.begin();
+// 	while (it != _channels.end())
+// 	{
+// 		if(it->second)
+// 			delete it->second;
+// 		it++;
+// 	}
+// 	_channels.clear();
+// 	std::map<int,Client*>::iterator its = _clients.begin();
+// 	while (its != _clients.end())
+// 	{
+// 		if(its->second)
+// 			delete it->second;
+// 		its++;
+// 	}
+// 	_clients.clear();
+	
+// }
 
 // getters
 
@@ -191,7 +210,6 @@ std::vector<std::string> Server::splitCommands(std::string msg)
 
     while (std::getline(iss, part, ' ')) 
 	{
-		// std::cout << part.find(':') <<std::endl;
         if (part.find(':')  == 0) 
 		{
             std::string restOfMessage = part.substr(1,part.size()-1);
@@ -206,7 +224,10 @@ std::vector<std::string> Server::splitCommands(std::string msg)
     }
     return cmd;
 }
-
+void Channel::cleatTopic()
+{
+	topic.clear();
+}
 std::map<int,Client*>::iterator	Server::findClientIt(int fd)
 {
 	std::map<int,Client*>::iterator ret = _clients.find(fd);
@@ -625,17 +646,7 @@ void Channel::setTime(std::string const &time)
 {
 	this->timeScCh = time;
 }
-Channel::~Channel()
-{
-	// std::map<Client*,bool>::iterator v = client.begin();
-	// while (v != client.end())
-	// {
-	// 	if(v->first)
-	// 		delete v->first;
-	// 	v++;
-	// }
-	// client.clear();
-}
+
 // std::string getTime()
 // {
 //         // Check if creatchannelTime is valid
@@ -722,6 +733,7 @@ Channel& Channel::operator=(const Channel& other) {
     }
     return *this;
 }
+
 bool	Channel::getLimit() const
 {
 	return islimit;

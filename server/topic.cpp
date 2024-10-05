@@ -1,7 +1,6 @@
 #include "../includes/irc.hpp"
 
-
-std::vector<std::string> Server::splitCommandsT(std::string msg)
+std::vector<std::string> splitCommandsT(std::string msg)
 {
     std::vector<std::string> cmd;
     std::string part;
@@ -28,11 +27,8 @@ std::vector<std::string> Server::splitCommandsT(std::string msg)
 int    Server::TOPIC(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
-        return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
-    bool flag;
-    if(cmd.find(':') != std::string::nopos)
-        
-    std::vector<std::string> args = splitCommands(cmd);
+        return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;  
+    std::vector<std::string> args = splitCommandsT(cmd);
     if(args.size() < 2)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"TOPIC")),1;
     std::string target = args[1];
@@ -41,6 +37,8 @@ int    Server::TOPIC(std::string cmd, Client &c)
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
     if(ch->checkIfIsClient(c.getNickname()) == 0)
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
+    if(target.size() == 1 && target[0] == ':')
+        return ch->cleatTopic(),1;
     if(args.size() == 2)
     {
         if(!ch->getIsTopic())

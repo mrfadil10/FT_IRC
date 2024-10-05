@@ -261,7 +261,8 @@ class Channel
 		bool chTopicOp;
     public:
         Channel(std::string _name,std::string password);
-        ~Channel();
+        // ~Channel();
+		void cleatTopic();
         Channel(const Channel &c);
 		void	setFdClien(int fd);
         Channel &operator=(const Channel &c);
@@ -330,7 +331,7 @@ class Server
 		
 	public:
 		Server(int port, std::string password);
-		~Server();
+		// ~Server();
 
 	int		createSocket();
 	void	launch();
