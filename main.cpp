@@ -54,7 +54,10 @@ bool	getport(char *ac, int &port)
 	}
 	return (true);
 }
-
+void f()
+{
+	system("leaks ircserv");
+}
 int main(int ac, char **av)
 {
 	int port;
@@ -77,5 +80,6 @@ int main(int ac, char **av)
 	{
 		std::cerr << e.what() << std::endl;
 	}
+	atexit(f);
 	return (0);
 }

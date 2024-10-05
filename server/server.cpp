@@ -6,7 +6,7 @@
 /*   By: eoussama <eoussama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/04 22:16:39 by eoussama         ###   ########.fr       */
+/*   Updated: 2024/10/05 17:55:04 by eoussama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,26 +18,26 @@ Server::Server(int port, std::string password) :_port(port), _password(password)
 	
 }
 
-// Server::~Server() {
+Server::~Server() {
 
-// 	std::map<std::string,Channel*>::iterator it = _channels.begin();
-// 	while (it != _channels.end())
-// 	{
-// 		if(it->second)
-// 			delete it->second;
-// 		it++;
-// 	}
-// 	_channels.clear();
-// 	std::map<int,Client*>::iterator its = _clients.begin();
-// 	while (its != _clients.end())
-// 	{
-// 		if(its->second)
-// 			delete it->second;
-// 		its++;
-// 	}
-// 	_clients.clear();
+	std::map<std::string,Channel*>::iterator it = _channels.begin();
+	while (it != _channels.end())
+	{
+		if(it->second)
+			delete it->second;
+		it++;
+	}
+	_channels.clear();
+	std::map<int,Client*>::iterator its = _clients.begin();
+	while (its != _clients.end())
+	{
+		if(its->second)
+			delete its->second;
+		its++;
+	}
+	_clients.clear();
 	
-// }
+}
 
 // getters
 
@@ -224,7 +224,7 @@ std::vector<std::string> Server::splitCommands(std::string msg)
     }
     return cmd;
 }
-void Channel::cleatTopic()
+void Channel::clearTopic()
 {
 	topic.clear();
 }
@@ -424,7 +424,6 @@ void			Server::joinZero(Client &c)
 		}
 		it++;
 	}
-	
 }
 void	Server::launch()
 {
@@ -562,24 +561,6 @@ std::string getTimeSc()
 		time_t		creatchannelTime;
 		std::stringstream		ss;
 		time(&creatchannelTime);
-        // if (creatchannelTime == -1) {
-        //     return "Error: Invalid time value";
-        // }
-
-        // // Convert to UTC using gmtime()
-		// // std::cout <<"ok ss  "<< creatchannelTime<<std::endl;
-        // struct tm* gmTime = gmtime(&creatchannelTime);
-        // if (gmTime == NULL) {
-        //     return "Error: Failed to convert to UTC";
-        // }
-        // // Format the time to YYYY-MM-DD HH:MM:SS
-        // char buffer[30];
-        // strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmTime);
-
-        // // Append milliseconds as ".000"
-        // std::string result(buffer);
-    	// result += ".000";
-		// // std::stringstream ss;
 		ss << creatchannelTime;
 
     return ss.str();

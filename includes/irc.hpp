@@ -45,7 +45,7 @@
 #define RPL_MODE(nick, username, host,target,mode,target_nick) ":" + nick + "!~" + username + "@" + host + " MODE " + target + " " + mode + " " + target_nick + "\r\n"
 #define RPL_INVITE(nick, username, host,target,target_nick) ":" + nick + "!~" + username + "@" + host + " INVITE " + target_nick + " " + target + "\r\n"
 #define RPL_KICK(nick, username, host,target,target_nick,message) ":" + nick + "!~" + username + "@" + host + " KICK " + target + " " + target_nick + " :" + message + "\r\n"
-#define RPL_TOPIC(nick, username, host,target,topic) ":" + nick + "!~" + username + "@" + host + " TOPIC " + target + " :" + topic + "\r\n"
+#define RPL_TOPIC(nick, username, host,target,topic) ":" + nick + "!~" + username + "@" + host + " TOPIC " + target +" "+ topic + "\r\n"
 #define RPL_NOTINV(nickname,hostname) (":" + hostname + " 664 " + nickname + ": Channel already not in invite-only mode\r\n")
 #define ERR_UNKNOWNCOMMAND(hostname, nick, arg) ":" + hostname + " 421 " + nick + " " + arg + " :Unknown command\r\n"
 #define ERR_NEEDMOREPARAMS(nick, hostname, cmd) ":" + hostname + " 461 " + nick + " " + cmd + " :Not enough parameters\r\n"
@@ -70,7 +70,7 @@
 #define ERR_INVITEONLY(hostname, nick, channelName) ":" + hostname + " 473 " + nick + " " + channelName + " :Cannot join channel, you must be invited (+i)\r\n"
 #define ERR_INVITEONLY(hostname, nick, channelName) ":" + hostname + " 473 " + nick + " " + channelName + " :Cannot join channel, you must be invited (+i)\r\n"
 #define RPL_JOIN_OP(nick, username, channelname, ipaddress) ":@" + nick + "!~" + username + "@" + ipaddress + " JOIN " + channelname + "\r\n"
-#define RPL_TOPICDISPLAY(hostname, nick, channel, topic) ":" + hostname + " 332 " + nick + " " + channel + " :" + topic + "\r\n"
+#define RPL_TOPICDISPLAY(hostname, nick, channel, topic) ":" + hostname + " 332 " + nick + " " + channel + " " + topic + "\r\n"
 // #define ERR_USERSDONTMATCH(nickname,hostname) ":"+hostname+" "+" 502 "+nickname+" :Cant change mode for other users\r\n"
 // #define RPL_CHANNELMODEIS(hostname, nick, channel, modes) ":" + hostname + " 324 " + nick + " " + channel + " " + modes + "\r\n"
 #define RPL_MODEISLIMIT(channel, hostname, mode, newlimit) ":" + hostname + " MODE " + channel + " " + mode + " " + newlimit + "\r\n"
@@ -262,7 +262,7 @@ class Channel
     public:
         Channel(std::string _name,std::string password);
         // ~Channel();
-		void cleatTopic();
+		void clearTopic();
         Channel(const Channel &c);
 		void	setFdClien(int fd);
         Channel &operator=(const Channel &c);
@@ -331,7 +331,7 @@ class Server
 		
 	public:
 		Server(int port, std::string password);
-		// ~Server();
+		~Server();
 
 	int		createSocket();
 	void	launch();

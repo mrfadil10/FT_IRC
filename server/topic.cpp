@@ -37,8 +37,7 @@ int    Server::TOPIC(std::string cmd, Client &c)
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
     if(ch->checkIfIsClient(c.getNickname()) == 0)
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
-    if(target.size() == 1 && target[0] == ':')
-        return ch->cleatTopic(),1;
+
     if(args.size() == 2)
     {
         if(!ch->getIsTopic())
@@ -55,11 +54,24 @@ int    Server::TOPIC(std::string cmd, Client &c)
             c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
         else
         {
-            ch->setTopic(args[2]);
-            ch->setIsTopic(true);
-            ch->setTimeTop(getTimeSc());
-            c.reply(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()));
-            ch->sendReplyAll(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()),c.getNickname());
+            std::vector<std::string> v = splitCommandSpace(args[2]);
+            std::string str = args[2];
+            if(v.size() == 1 && v.at(0)[0] == ':' && v.at(0).size() == 1)
+            {
+                ch->clearTopic();
+                ch->setIsTopic(false);
+                c.reply(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,":"));
+                ch->sendReplyAll(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,":"),c.getNickname());
+            }else
+            {
+                if(v.size() == 1 && v.at(0)[0] == ':')
+                    str = args[2].substr(1,args[2].size()-1);   
+                ch->setTopic(str);
+                ch->setIsTopic(true);
+                ch->setTimeTop(getTimeSc());
+                c.reply(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()));
+                ch->sendReplyAll(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()),c.getNickname());
+            }
         }
     }
     return 0;
