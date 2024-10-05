@@ -9,7 +9,7 @@ std::vector<std::string> splitCommandsT(std::string msg)
 	{
         if (part.find(':')  == 0) 
 		{
-            std::string restOfMessage = part.substr(0,part.size() - 1);
+            std::string restOfMessage = part.substr(0,part.size());
             std::string remaining;
             if (std::getline(iss, remaining)) 
                 restOfMessage += " " + remaining;
@@ -20,6 +20,36 @@ std::vector<std::string> splitCommandsT(std::string msg)
 			cmd.push_back(part);
     }
     return cmd;
+}
+std::vector<std::string> splitCommandSpace(std::string msg)
+{
+	std::vector<std::string>	cmd;
+	std::stringstream	str(msg);
+	std::string				tm;
+	if (msg == "\n")
+		return (cmd);
+    while (std::getline(str, tm, ' '))
+	{
+        if (!tm.empty())
+		    cmd.push_back(tm);
+	}
+	return (cmd);
+}
+int checkTwoPoint(std::string str)
+{
+    bool flag = false;
+    std::cout << str.size()<<std::endl;
+    if(str[0] == ':')
+            flag = true;
+    for (size_t i = 0; i < str.size(); i++)
+    {
+        if (str[i] >= 33 && str[i] <= 126)
+            flag = false;
+    }
+    std::cout << flag << std::endl;
+    if(flag)
+        return 1;
+    return 0;
 }
 int    Server::TOPIC(std::string cmd, Client &c)
 {
@@ -34,8 +64,7 @@ int    Server::TOPIC(std::string cmd, Client &c)
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
     if(ch->checkIfIsClient(c.getNickname()) == 0)
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
-    if(target.size() == 1 && target[0] == ':')
-        return ch->cleatTopic(),1;
+
     if(args.size() == 2)
     {
         if(!ch->getIsTopic())
@@ -51,11 +80,24 @@ int    Server::TOPIC(std::string cmd, Client &c)
             c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
         else
         {
-            ch->setTopic(args[2]);
-            ch->setIsTopic(true);
-            ch->setTimeTop(getTimeSc());
-            c.reply(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()));
-            ch->sendReplyAll(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()),c.getNickname());
+            std::vector<std::string> v = splitCommandSpace(args[2]);
+            std::string str = args[2];
+            if(v.size() == 1 && v.at(0)[0] == ':' && v.at(0).size() == 1)
+            {
+                ch->clearTopic();
+                ch->setIsTopic(false);
+                c.reply(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,":"));
+                ch->sendReplyAll(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,":"),c.getNickname());
+            }else
+            {
+                if(v.size() == 1 && v.at(0)[0] == ':')
+                    str = args[2].substr(1,args[2].size()-1);   
+                ch->setTopic(str);
+                ch->setIsTopic(true);
+                ch->setTimeTop(getTimeSc());
+                c.reply(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()));
+                ch->sendReplyAll(RPL_TOPIC(c.getNickname(),c.getUsername(),c.getHost(),target,ch->getTopic()),c.getNickname());
+            }
         }
     }
     return 0;
