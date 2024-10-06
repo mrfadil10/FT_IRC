@@ -17,7 +17,6 @@ int Server::PRIVMSG(std::string cmd, Client& client)
     if(client.getState() != REGISTERED)
         return client.reply(ERR_NOTREGISTERED(client.getNickname(),client.getHost())),1;
     std::vector<std::string> receiver;
-    std::string str;
     std::vector<std::string> args = splitCommands(cmd);
     int num = args.size();
     if (num < 2)

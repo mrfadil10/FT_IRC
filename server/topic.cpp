@@ -23,6 +23,21 @@ std::vector<std::string> splitCommandsT(std::string msg)
     return cmd;
 }
 
+std::vector<std::string> splitCommandSpace(std::string msg)
+{
+	std::vector<std::string>	cmd;
+	std::stringstream	str(msg);
+	std::string				tm;
+	if (msg == "\n")
+		return (cmd);
+    while (std::getline(str, tm, ' '))
+	{
+        if (!tm.empty())
+		    cmd.push_back(tm);
+	}
+	return (cmd);
+}
+
 
 int    Server::TOPIC(std::string cmd, Client &c)
 {
@@ -37,7 +52,6 @@ int    Server::TOPIC(std::string cmd, Client &c)
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
     if(ch->checkIfIsClient(c.getNickname()) == 0)
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
-
     if(args.size() == 2)
     {
         if(!ch->getIsTopic())
