@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/07 16:36:52 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/07 16:39:21 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,7 +213,7 @@ std::vector<std::string> Server::splitCommands(std::string msg)
 	{
         if (part.find(':')  == 0) 
 		{
-            std::string restOfMessage = part.substr(1,part.size() -1);
+            std::string restOfMessage = part.substr(1,part.size()-1);
             std::string remaining;
             if (std::getline(iss, remaining)) 
                 restOfMessage += " " + remaining;

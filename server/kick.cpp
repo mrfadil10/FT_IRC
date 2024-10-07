@@ -3,9 +3,7 @@
 
 std::vector<std::string> splitNickName(std::string msg)
 {
-	// int					i = 0;
 	std::vector<std::string>	cmd;
-    // std::cout << msg << std::endl;
 	std::stringstream	str(msg);
 	std::string				tm;
 	if (msg == "\n")
@@ -34,11 +32,13 @@ int    Server::KICK(std::string cmd, Client &c)
     if(!ch->findClientRole(c.getNickname()))
         return c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target)),1;
     std::vector<std::string> vec = splitNickName(args[2]);
-    std::string reason = args.size() >= 4 ? args[3] : "";
+    std::string reason = args.size() >= 4 ? args[3] : ":Kicked by the channel's operator";
     for(size_t i = 0;i < vec.size();i++)
     {
+        /*
         if(ch->checkIfIsClient(c.getNickname()) == 0)
             return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
+        */
         if(ch->checkIfIsClient(vec.at(i)) == 0)
         {
             c.reply(ERROR_USERNOTINCHANNEL(c.getHost(),target,vec.at(i)));

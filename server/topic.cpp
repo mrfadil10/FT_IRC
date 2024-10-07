@@ -1,4 +1,5 @@
 #include "../includes/irc.hpp"
+
 std::vector<std::string> splitCommandsT(std::string msg)
 {
     std::vector<std::string> cmd;
@@ -9,18 +10,19 @@ std::vector<std::string> splitCommandsT(std::string msg)
 	{
         if (part.find(':')  == 0) 
 		{
-            std::string restOfMessage = part.substr(0,part.size());
+            std::string restOfMessage = part.substr(0,part.size()-1);
             std::string remaining;
             if (std::getline(iss, remaining)) 
                 restOfMessage += " " + remaining;
             cmd.push_back(restOfMessage);
             return cmd;
-        }
+        }                                                                                                                       
 		if(!part.empty())
 			cmd.push_back(part);
     }
     return cmd;
 }
+
 std::vector<std::string> splitCommandSpace(std::string msg)
 {
 	std::vector<std::string>	cmd;
@@ -35,26 +37,12 @@ std::vector<std::string> splitCommandSpace(std::string msg)
 	}
 	return (cmd);
 }
-int checkTwoPoint(std::string str)
-{
-    bool flag = false;
-    std::cout << str.size()<<std::endl;
-    if(str[0] == ':')
-            flag = true;
-    for (size_t i = 0; i < str.size(); i++)
-    {
-        if (str[i] >= 33 && str[i] <= 126)
-            flag = false;
-    }
-    std::cout << flag << std::endl;
-    if(flag)
-        return 1;
-    return 0;
-}
+
+
 int    Server::TOPIC(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
-        return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;
+        return c.reply(ERR_NOTREGISTERED(c.getNickname(),c.getHost())),1;  
     std::vector<std::string> args = splitCommandsT(cmd);
     if(args.size() < 2)
         return c.reply(ERR_NEEDMOREPARAMS(c.getNickname(),c.getHost(),"TOPIC")),1;
@@ -64,7 +52,6 @@ int    Server::TOPIC(std::string cmd, Client &c)
         return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
     if(ch->checkIfIsClient(c.getNickname()) == 0)
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
-
     if(args.size() == 2)
     {
         if(!ch->getIsTopic())
@@ -74,7 +61,8 @@ int    Server::TOPIC(std::string cmd, Client &c)
             c.reply(RPL_TOPICDISPLAY(c.getHost(),c.getNickname(),target,ch->getTopic()));
             c.reply(REPLY_TOPICWHOTIME(c.getUsername(),ch->getTimeTop(),c.getNickname(),c.getHost(),target));
         }
-    }else
+    }
+    else
     {
         if(!ch->findClientRole(c.getNickname()) && ch->getChTopOp())
             c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
@@ -92,7 +80,6 @@ int    Server::TOPIC(std::string cmd, Client &c)
             {
                 if(v.size() == 1 && v.at(0)[0] == ':')
                     str = args[2].substr(1,args[2].size()-1);
-                std::cout << str <<std::endl;
                 ch->setTopic(str);
                 ch->setIsTopic(true);
                 ch->setTimeTop(getTimeSc());
