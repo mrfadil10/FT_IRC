@@ -33,13 +33,12 @@ int Server::JOIN(std::string cmd, Client &c)
     std::string keys;
     for (size_t i = 0;i < channels.size();i++)
     {
-        keys = i < key.size() && !key[i].empty() && (key[i].find(' ') == std::string::npos)  ? key[i]:"";
         if (channels[i][0] != '#' || channels[i].find(' ') != std::string::npos || channels[i].size() == 1)
         {
             c.reply(ERR_BADCHANNELNAME(c.getNickname(),c.getHost(),channels[i]));
             continue;
         }
-        
+        keys = i < key.size() && !key[i].empty() && (key[i].find(' ') == std::string::npos)  ? key[i]:"";
         if (!checkIfChannelExist(channels[i]))
         {
             Channel *ch = new Channel(channels[i],keys);

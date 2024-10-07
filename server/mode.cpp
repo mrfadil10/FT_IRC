@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/06 20:04:16 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/08 00:40:15 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ int    Server::MODE(std::string cmd, Client &c)
         if(c.getNickname().compare(target) == 0)
             return c.reply(RPL_UMODEIS(c.getHost(),c.getNickname(),"+Zi")),1;
         if(getClientByNickNameS(target))
-            return c.reply(ERR_USERSDONTMATCH(c.getNickname(),c.getHost())),1;
+            return c.reply(ERR_USERSDONTMATCH(c.getHost(),c.getNickname())),1;
         return c.reply(ERR_NOSUCHNICK(c.getHost(),c.getNickname(),target)),1;
     }
     
@@ -129,8 +129,10 @@ int    Server::MODE(std::string cmd, Client &c)
     std::string mode = args[2];
     std::string as,m;
     bool flag  = true;
-    if(ch->checkIfIsClientNickName(c.getNickname()) == 0)
+    if(!ch->checkIfIsClientNickName(c.getNickname()))
         return c.reply(ERR_NOTONCHANNEL(c.getHost(),c.getNickname())),1;
+    if(!ch->findClientRole(c.getNickname()))
+        return c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target)),1;
     std::string nick = c.getNickname();
     std::vector<std::string>::iterator it = args.begin()+3;
     for(size_t i= 0; i < mode.size() ;i++)
@@ -139,9 +141,7 @@ int    Server::MODE(std::string cmd, Client &c)
         else if(mode[i] == '+') flag = true;
         else if(mode[i] == 'i')
         {
-            if(!ch->findClientRole(c.getNickname()))
-                c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
-            else if(flag && ch->getInviteOnly())
+            if(flag && ch->getInviteOnly())
                 continue;
             else if(!flag && !ch->getInviteOnly())
                 continue;
@@ -161,15 +161,6 @@ int    Server::MODE(std::string cmd, Client &c)
         {
             if(it == args.end())
                 c.reply("Reply(696): "+target+" k * You must specify a parameter for the key mode. Syntax: <key>.\r\n");
-            else if(!ch->findClientRole(c.getNickname()))
-                c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
-            // else if(!flag && !ch->getKey())
-            // {
-            //     // c.reply(ERR_NOKEYSET(c.getHost(),nick,target));
-            //     it++;
-            // }
-            // else if(flag && ch->getKey())
-            //     it++;
             else
             {
                 if(!flag)
@@ -198,9 +189,7 @@ int    Server::MODE(std::string cmd, Client &c)
             } 
         }else if(mode[i]== 't')
         {
-            if(!ch->findClientRole(c.getNickname()))
-                c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
-            else if(ch->getChTopOp() && flag)
+            if(ch->getChTopOp() && flag)
                 continue;
             else if(!ch->getChTopOp() && !flag)
                 continue;
@@ -215,8 +204,6 @@ int    Server::MODE(std::string cmd, Client &c)
         {
             if(it == args.end() && flag)
                 c.reply(ERROR_INVALIDMODEPARAM_LIMIT(target,c.getHost(),"*"));
-            else if(!ch->findClientRole(c.getNickname()))
-                c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
             else if(!ch->getLimit() && !flag)
                 continue;
             else 
@@ -257,9 +244,7 @@ int    Server::MODE(std::string cmd, Client &c)
         {
             if(it == args.end())
                 c.reply(ERROR_INVALIDMODEPARAM_OP(target,c.getHost()));
-            else if(ch->findClientRole(c.getNickname()) != 1)
-                c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
-            else if(ch->checkIfIsClientNickName(*it) == 0)
+            else if(!ch->checkIfIsClientNickName(*it))
                 c.reply(ERR_NOSUCHNICK(c.getHost(),c.getNickname(),*it));
             else
             {
@@ -276,7 +261,6 @@ int    Server::MODE(std::string cmd, Client &c)
                     ch->setClientRole(*it,flag);
                     it++;
                 }
-                
             }
             
         }else
