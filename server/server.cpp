@@ -213,7 +213,7 @@ std::vector<std::string> Server::splitCommands(std::string msg)
 	{
         if (part.find(':')  == 0) 
 		{
-            std::string restOfMessage = part.substr(1,part.size()-1);
+            std::string restOfMessage = part.substr(1,part.size());
             std::string remaining;
             if (std::getline(iss, remaining)) 
                 restOfMessage += " " + remaining;
