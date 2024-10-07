@@ -91,7 +91,8 @@ int    Server::TOPIC(std::string cmd, Client &c)
             }else
             {
                 if(v.size() == 1 && v.at(0)[0] == ':')
-                    str = args[2].substr(1,args[2].size()-1);   
+                    str = args[2].substr(1,args[2].size()-1);
+                std::cout << str <<std::endl;
                 ch->setTopic(str);
                 ch->setIsTopic(true);
                 ch->setTimeTop(getTimeSc());

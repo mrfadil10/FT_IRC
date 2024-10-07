@@ -36,8 +36,13 @@ int    Server::PART(std::string cmd, Client &c)
         else
         {
             c.reply(PART_REPLY(c.getNickname(),c.getUsername(),c.getHost(),vec.at(i),reason));
-            ch->removeClientNickName(c.getNickname());
             ch->sendReplyAll(PART_REPLY(c.getNickname(),c.getUsername(),c.getHost(),vec.at(i),reason),c.getNickname());
+            ch->removeClientNickName(c.getNickname());
+            if(ch->get_nbr_client() == 0)
+            {
+                delete _channels[vec.at(i)];
+                _channels.erase(vec.at(i));
+            }
         }
     }
     

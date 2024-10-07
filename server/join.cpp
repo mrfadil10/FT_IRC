@@ -39,6 +39,7 @@ int Server::JOIN(std::string cmd, Client &c)
             c.reply(ERR_BADCHANNELNAME(c.getNickname(),c.getHost(),channels[i]));
             continue;
         }
+        
         if (!checkIfChannelExist(channels[i]))
         {
             Channel *ch = new Channel(channels[i],keys);
@@ -60,8 +61,7 @@ int Server::JOIN(std::string cmd, Client &c)
                 c.reply(ERR_BADCHANNELKEY(c.getNickname(),c.getHost(),channels[i]));
             else 
             {
-                bool op = cn->get_nbr_client() == 0 ? true : false;
-                cn->addClient(c.getFd(),c.getNickname(),op);
+                cn->addClient(c.getFd(),c.getNickname(),false);
                 c.reply(RPL_JOIN(c.getNickname(),c.getUsername(),channels[i],c.getHost()));
                 if(cn->getIsTopic())
                 {

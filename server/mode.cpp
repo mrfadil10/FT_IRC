@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/04 17:46:11 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/06 20:04:16 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,12 +239,6 @@ int    Server::MODE(std::string cmd, Client &c)
                         it++;
                         continue;
                     }
-                    // if(aatoi(*it).c_str()) == 0)
-                    // {
-                    //     ch->setLimit(false);
-                    //     ch->setMaxClient(0);
-                    //     ch->eraseMode('l');
-                    // }
                     else
                     {
                         ch->setLimit(flag);

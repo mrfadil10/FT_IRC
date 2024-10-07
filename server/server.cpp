@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/04 23:42:38 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/07 16:36:52 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,7 @@ void	Server::eraseClient(int fd)
 	{
 		if (it->second->getFd() == fd)
 		{
+			delete this->_clients[fd];
 			_clients.erase(it);
 			return ;
 		}
@@ -416,14 +417,16 @@ void	Client::reply(std::string msg)
 void			Server::joinZero(Client &c)
 {
 	std::map<std::string,Channel*>::iterator it  = _channels.begin();
-	while (it != _channels.end())
-	{
-		if(it->second->checkIfIsClientNickName(c.getNickname()))
-		{
-			PART("PART "+it->first+" :Sorry",c);
-		}
-		it++;
-	}
+    std::string cmd = "PART ";
+    while (it != _channels.end())
+    {
+        if(it->second->checkIfIsClientNickName(c.getNickname()))
+        {
+            cmd += it->first+",";
+        }
+        it++;
+    }
+	PART(cmd,c);
 }
 void	Server::launch()
 {
@@ -509,17 +512,10 @@ void		Client::setIsInvisible(bool ischeck)
 
 Channel	*Server::getChannel(std::string &target)
 {
-	try
-	{
-		std::map<std::string,Channel*>::iterator i = _channels.find(target);
-		if(i != _channels.end())
-			return i->second;
+	std::map<std::string,Channel*>::iterator i = _channels.find(target);
+	if(i != _channels.end())
+		return i->second;
 
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
 	return NULL;
     
 }
@@ -547,6 +543,7 @@ int     Server::checkIfChannelExist(std::string &target)
 void    Channel::removeClientNickName(std::string const &nickname)
 {
 	this->client.erase(nickname);
+	this->invite.erase(nickname);
 }
 // void	Server::set_Channel(Channel const &ch)
 // {
@@ -916,8 +913,10 @@ void	Channel::sendReplyAll(const std::string &msg,std::string nickname)
 		std::map<std::string,std::pair<bool,int> >::iterator it = client.begin();
 		while (it != client.end())
 		{
+			std::cout <<"kk "<< it->first<< std::endl;
 			if (it->first.compare(nickname) != 0)
 			{
+				std::cout << it->first<< std::endl;
 				if(send(it->second.second, msg.c_str(), msg.length(), 0) < 0)
 					throw std::runtime_error("\033[1;91mError send.\033[0m");
 			}

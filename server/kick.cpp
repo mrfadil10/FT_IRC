@@ -44,9 +44,14 @@ int    Server::KICK(std::string cmd, Client &c)
             c.reply(ERROR_USERNOTINCHANNEL(c.getHost(),target,vec.at(i)));
             continue;
         }
-        ch->removeClientNickName(vec.at(i));
         c.reply(RPL_KICK(c.getNickname(),c.getUsername(),c.getHost(),target,vec.at(i),reason));
         ch->sendReplyAll(RPL_KICK(c.getNickname(),c.getUsername(),c.getHost(),target,vec.at(i),reason),c.getNickname());
+        ch->removeClientNickName(vec.at(i));
+    }
+    if(ch->get_nbr_client() == 0)
+    {
+        delete _channels[target];
+        _channels.erase(target);
     }
     return 0;
 }
