@@ -56,7 +56,7 @@
 #define ERR_NOKEYSET(hostname, nick, chann) ":" + hostname + " 467 " + nick + " " + chann + " :Cannot remove channel key (no key set)\r\n"
 // #define ERR_UNKNOWNMODE(hostname, nick, c) ":" + hostname + " 472 " + nick + " " + c + " :is unknown mode char to me\r\n"
 #define ERR_NOTREGISTERED(nick, hostname) ":" + hostname + " 451 " + nick + " :You have not registered\r\n"
-#define ERR_USERONCHANNEL(hostname, nick, chann) ":" + hostname + " 443 " + nick + " " + chann + " :is already on channel\r\n"
+#define ERR_USERONCHANNEL(hostname, nick, chann) ":" + hostname + " 443 " + nick + " " + chann + " :is already on channefvl\r\n"
 #define ERR_NOTONCHANNEL(hostname, chann) ":" + hostname + " 442 " + chann + " " + ":You're not on that channel\r\n"
 #define ERR_CANNOTSENDTOCHAN(hostname, nick, channel) ":" + hostname + " 404 " + nick + " " + channel + " :Cannot send to channel\r\n"
 //#define ERR_PASSWDMISMATCH(nick, hostname) ":" + hostname + " 464 " + nick + " :Password incorrect !\r\n"

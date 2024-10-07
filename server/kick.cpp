@@ -35,10 +35,8 @@ int    Server::KICK(std::string cmd, Client &c)
     std::string reason = args.size() >= 4 ? args[3] : ":Kicked by the channel's operator";
     for(size_t i = 0;i < vec.size();i++)
     {
-        /*
-        if(ch->checkIfIsClient(c.getNickname()) == 0)
-            return c.reply(ERR_NOTONCHANNEL(c.getHost(),target)),1;
-        */
+        if(ch->findClientRole(c.getNickname()) == 0)
+            return c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target)),1;
         if(ch->checkIfIsClient(vec.at(i)) == 0)
         {
             c.reply(ERROR_USERNOTINCHANNEL(c.getHost(),target,vec.at(i)));
