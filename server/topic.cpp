@@ -10,7 +10,7 @@ std::vector<std::string> splitCommandsT(std::string msg)
 	{
         if (part.find(':')  == 0) 
 		{
-            std::string restOfMessage = part.substr(0,part.size()-1);
+            std::string restOfMessage = part.substr(0,part.size());
             std::string remaining;
             if (std::getline(iss, remaining)) 
                 restOfMessage += " " + remaining;
