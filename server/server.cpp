@@ -307,7 +307,7 @@ void	Server::parseCmd(std::string str, Client &cl,int fd)
 			return ;
 		}
 	}
-	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(str))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(str))).c_str()),0);
+	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str()),0);
 }
  //else {
 //         cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
