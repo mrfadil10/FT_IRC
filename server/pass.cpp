@@ -2,7 +2,7 @@
 
 std::string	ERR_PASSWDMISMATCH(Client &client)
 {
-	return ("\033[1;91m" + client.getNickname() + " :Password incorrect");
+	return ("\033[1;91m" + client.getNickname() + " :Password incorrect\r\n");
 }
 
 int		teststring(std::string test)

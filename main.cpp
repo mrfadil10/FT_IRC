@@ -26,7 +26,7 @@ std::string	del_break(std::string str)
 
 std::string	ERROR_NEED_MORE_PARAMETERS(Client &client, std::string cmd)
 {
-	return ("461 " + client.getNickname() + " " + cmd + " :Not enough parameters");
+	return ("461 " + client.getNickname() + " " + cmd + " :Not enough parameters\r\n");
 }
 
 void	signalHandler(int const signal)
@@ -44,12 +44,12 @@ bool	getport(char *ac, int &port)
 	port = strtol(ac, &buffer, 10);
 	if (*buffer != '\0')
 	{
-		std::cout << "Error input: port must contain only digits" << std::endl;
+		std::cout << "Error input: port must contain only digits\r\n" << std::endl;
 		return (false);
 	}
 	if (port < 0 || port > 65535)
 	{
-		std::cout << "Error input: port is out of range [0; 65535]" << std::endl;
+		std::cout << "Error input: port is out of range [0; 65535]\r\n" << std::endl;
 		return (false);
 	}
 	return (true);
@@ -66,7 +66,7 @@ int main(int ac, char **av)
 	signal(SIGQUIT, signalHandler);
 	if (ac != 3)
 	{
-		std::cout << "Usage: ./ircserv <port> <password>" << std::endl;
+		std::cout << "Usage: ./ircserv <port> <password>\r\n" << std::endl;
 		return (1);
 	}
 	if (getport(av[1], port) == false)

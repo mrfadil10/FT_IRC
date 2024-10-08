@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/08 00:00:37 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/08 22:12:27 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,7 +268,6 @@ void	Server::handleMessage(int fd)
 	try
 	{
 		this->_cmd = readMessage(fd);
-		// std::cout << this->_cmd.size() << std::endl;
 	}
 	catch (const std::exception& e)
 	{
@@ -276,40 +275,44 @@ void	Server::handleMessage(int fd)
 		std::cerr << e.what() << '\n';
 		return ;
 	}
-	try
-	{
-		std::vector<std::string> v = splitCommands(del_break(_cmd));
-		// for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
-		parseCmd(v.at(0), *findClient(fd));
-		displayClient();
-	}
-	catch(const std::exception& e)
-	{
-		_clients[fd]->reply("->");
-	}
+	if(!del_break(_cmd).empty())
+		parseCmd(_cmd, *findClient(fd),fd);
+	displayClient();
 }
 
-void	Server::parseCmd(std::string str, Client &cl)
+void	Server::parseCmd(std::string str, Client &cl,int fd)
 {
-    std::map<std::string, int (Server::*)(std::string, Client &)> cmdMap;
-	cmdMap["PASS"]    = &Server::cmdPass;
-    cmdMap["NICK"]    = &Server::cmdNick;
-    cmdMap["USER"]    = &Server::cmdUser;
-    cmdMap["JOIN"]    = &Server::JOIN;
-    cmdMap["MODE"]    = &Server::MODE;
-    cmdMap["TOPIC"]   = &Server::TOPIC;
-    cmdMap["KICK"]    = &Server::KICK;
-    cmdMap["PART"]    = &Server::PART;
-    cmdMap["INVITE"]  = &Server::INVITE;
-    cmdMap["PRIVMSG"] = &Server::PRIVMSG;
-	
-    std::map<std::string, int (Server::*)(std::string, Client &)>::iterator it = cmdMap.find(str);
-    if (it != cmdMap.end()) {
-        (this->*(it->second))(del_break(_cmd), cl);
-    } else {
-        cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
-    }
+    std::string	tmp;
+	std::stringstream	ss(str);
+	std::getline(ss, tmp, ' ');
+	std::string cmds[10] = {"PASS", "NICK", "USER", "JOIN","MODE", "TOPIC", "KICK", "PART", "INVITE", "PRIVMSG"};
+
+	int		(Server::*ptr[10])(std::string , Client &cl) = {
+			&Server::cmdPass,
+			&Server::cmdNick,
+			&Server::cmdUser,
+			&Server::JOIN,
+			&Server::MODE, 
+			&Server::TOPIC,
+			&Server::KICK,
+			&Server::PART,
+			&Server::INVITE,
+			&Server::PRIVMSG
+	};
+	for (int i = 0; i <= 9; ++i)
+	{
+		if (del_break(tmp) == cmds[i])
+		{
+			(this->*ptr[i])(del_break(_cmd), cl);
+			return ;
+		}
+	}
+	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(str))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(str))).c_str()),0);
 }
+ //else {
+//         cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
+//     }
+// }
 
 // Client		&Server::findClient(std::string nickname)
 // {
@@ -410,7 +413,7 @@ void	Channel::eraseClient(std::string nickname)
 }
 void	Client::reply(std::string msg)
 {
-	std::cout << I_GREEN << "----> " << msg << RESET << std::endl;
+	// std::cout << I_GREEN << "----> " << msg << RESET << std::endl;
 	if (send(sockfd, msg.c_str(), msg.length(), 0) < 0)
 		throw (std::runtime_error("\033[1;91mError while sending message\033[0m"));
 }
@@ -924,10 +927,10 @@ void	Channel::sendReplyAll(const std::string &msg,std::string nickname)
 		}
 }
 
-void	Server::replys(const Client &c, const std::string &msg)
-{
-	send(c.getFd(), msg.c_str(), strlen(msg.c_str()), 0);
-}
+// void	Server::replys(const Client &c, const std::string &msg)
+// {
+// 	send(c.getFd(), msg.c_str(), strlen(msg.c_str()), 0);
+// }
 void Channel::setMode(char s)
 {
 	this->mode.insert(s);

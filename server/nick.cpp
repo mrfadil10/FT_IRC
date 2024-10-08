@@ -34,7 +34,7 @@ bool	is_valid_nick(std::string name)
 
 std::string	ERRMSG_EMPTY(Client cl)
 {
-	return ("\033[1;91m" + cl.getNickname() + " :No nickname was given\033[0m");
+	return ("\033[1;91m" + cl.getNickname() + " :No nickname was given\033[0m\r\n");
 }
 
 std::string	NICK_ERR(Client cl, std::string newNick)
@@ -49,7 +49,7 @@ std::string	ERRMSG_ALREADYUSED(Client cl, std::string newNick)
 
 std::string NICK_SUCCESS(std::string newNick)
 {
-	return ("\033[1;92mNICK " + newNick + "\033[0m");
+	return ("\033[1;92mNICK " + newNick + "\033[0m\r\n");
 }
 
 int Server::cmdNick(std::string cmd, Client& client)
