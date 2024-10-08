@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/08 22:12:27 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/08 23:23:19 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,6 @@ void	Server::newCl()
 		throw std::runtime_error("\033[1;91mError while accepting new client.\033[0m");
 	if (getnameinfo((struct sockaddr *) &s_adress, sizeof(s_adress), buf, NI_MAXHOST, NULL, 0, NI_NUMERICSERV) != 0)
 		throw std::runtime_error("\033[1;91mError while getting hostname on new client.\033[0m");
-	// _clients.push_back(Client(new_fd, buf));
 	_clients[new_fd] = new Client(new_fd,buf);
 	pollfd pollfd = {new_fd, POLLIN, 0};
 	_pollfds.push_back(pollfd);
@@ -307,7 +306,7 @@ void	Server::parseCmd(std::string str, Client &cl,int fd)
 			return ;
 		}
 	}
-	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(str))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(str))).c_str()),0);
+	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str()),0);
 }
  //else {
 //         cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
