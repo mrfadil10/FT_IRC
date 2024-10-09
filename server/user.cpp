@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:48:53 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/09 16:21:09 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/09 18:18:24 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 int	Server::cmdUser(std::string cmds, Client &cl)
 {
-	if(cl.getState() != LOGIN)
-		return cl.reply(ERR_NOTREGISTERED(cl.getNickname(),cl.getHost())),1;
 	std::vector<std::string> args = splitCommands(del_break(cmds));
 	std::string	tmp;
 	std::string	cmd = args.at(0);
@@ -55,7 +53,7 @@ int	Server::cmdUser(std::string cmds, Client &cl)
 		tmp += args.at(i);
 		cl.setFullname(tmp);
 	}
-	cl.welcome();
 	displayClient();
+	cl.welcome();
 	return (0);
 }

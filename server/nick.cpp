@@ -54,8 +54,6 @@ std::string NICK_SUCCESS(std::string newNick)
 
 int Server::cmdNick(std::string cmd, Client& client)
 {
-	if(client.getState() != LOGIN)
-		return client.reply(ERR_NOTREGISTERED(client.getNickname(),client.getHost())),1;
 	std::vector<std::string> args = splitCommands(cmd);
 	if (args.size() < 2) return (client.reply(ERR_NONICKNAMEGIVEN(client.getNickname(),client.getHost())), -1);
 	std::string requestedNick = args[1];
