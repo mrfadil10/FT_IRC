@@ -1,9 +1,9 @@
 #include "../includes/irc.hpp"
 
-std::string	ERR_PASSWDMISMATCH(Client &client)
-{
-	return ("\033[1;91m" + client.getNickname() + " :Password incorrect\r\n");
-}
+// std::string	ERR_PASSWDMISMATCH(Client &client)
+// {
+// 	return ("\033[1;91m" + client.getNickname() + " :Password incorrect\r\n");
+// }
 
 int		teststring(std::string test)
 {
@@ -25,7 +25,7 @@ int Server::cmdPass(std::string arg, Client &cl)
 	std::vector<std::string> pswrd = splitCommands(del_break(arg));
 	if (pswrd.size() < 2)
 	{
-		cl.reply(ERROR_NEED_MORE_PARAMETERS(cl, "Password"));
+		cl.reply(ERR_NEEDMOREPARAMS(cl.getNickname(),cl.getHost(),"PASS"));
 		return (-1);
 	}
 	std::string mdp = del_break(pswrd[1]);
@@ -34,10 +34,11 @@ int Server::cmdPass(std::string arg, Client &cl)
 		std::cout <<"password[1] : " << "[" << mdp << "]"<< std::endl;
 		std::cout << "password : " << "[" << _password << "]" << std::endl;
 		teststring(pswrd[1]);
-		cl.reply(ERR_PASSWDMISMATCH(cl));
+		cl.reply(ERR_PASSWDMISMATCH(cl.getNickname(),cl.getHost()));
 		return (-1);
 	}
 	cl.setState(LOGIN);
+	displayClient();
 	cl.welcome();
 	return (0);
 }

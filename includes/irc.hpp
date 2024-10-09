@@ -59,11 +59,11 @@
 #define ERR_USERONCHANNEL(hostname, nick, chann) ":" + hostname + " 443 " + nick + " " + chann + " :is already on channel\r\n"
 #define ERR_NOTONCHANNEL(hostname, chann) ":" + hostname + " 442 " + chann + " " + ":You're not on that channel\r\n"
 #define ERR_CANNOTSENDTOCHAN(hostname, nick, channel) ":" + hostname + " 404 " + nick + " " + channel + " :Cannot send to channel\r\n"
-//#define ERR_PASSWDMISMATCH(nick, hostname) ":" + hostname + " 464 " + nick + " :Password incorrect !\r\n"
-#define ERR_ERRONEUSNICKNAME(nick, hostname) ":" + hostname + " 432 * " + nick + " :Erroneus nickname !\r\n"
+#define ERR_PASSWDMISMATCH(nick, hostname) ":" + hostname + " 464 " + nick + " :Password incorrect !\r\n"
+#define ERR_ERRONEUSNICKNAME(nick, hostname,newNike) ":" + hostname + " 432 * " + nick +" "+newNike+ " :Erroneus nickname\r\n"
 #define ERR_NONICKNAMEGIVEN(nick, hostname) ":" + hostname + " 431 " + nick + " :No nickname given !\r\n"
 #define ERR_NICKNAMEINUSE(nick, hostname) ":" + hostname + " 433 " + nick + " :Nickname is already in use !\r\n"
-#define ERR_ALREADYREGISTERED(nick, hostname) ":" + hostname + " 462 " + nick + " :You may not reregister !\r\n"
+#define ERR_ALREADYREGISTERED(server, client) (":" + server + " 462 " + client + " :You may not reregister\r\n")
 #define ERR_BADCHANNELNAME(nick, hostname, channelname) ":" + hostname + " 476 " + nick + " " + channelname + " :Invalid channel name." + "\r\n"
 #define ERR_CHANNELISFULL(hostname, nick, channelName) ":" + hostname + " 471 " + nick + " " + channelName + " :Cannot join channel, Channel is full (+l)\r\n"
 #define ERR_BADCHANNELKEY(nick, hostname, channelName) ":" + hostname + " 475 " + nick + " " + channelName + " :Cannot join channel (+K) - bad key\r\n"
@@ -76,7 +76,7 @@
 #define RPL_ALLINV(nickname,hostname) ":"+ hostname +" 665 " + nickname + ": Channel already set in invite-only mode\r\n"
 #define RPL_WHOISOPERATOR (host,nick) ":" + hostname + " 313 "+host+" "+nick+" :is an IRC operator\r\n"
 #define RPL_CHANNELMODEIS(hostname,client, channel, modes) ":" + hostname + " 324 " + client + " " + channel + " " + modes + "\r\n"
-#define RPL_NICKCHANGE(oldNick, nick,username,hostname) ":" + oldNick + "!~" + username + "@" + hostname + " NICK :" + nick + "\r\n"
+#define RPL_NICKCHANGE(oldNick, nick,username,hostname) ":" + oldNick + "!~" + username + "@" + hostname + " NICK " + nick + "\r\n"
 #define NICKNAME_RPLY(nickname, username, hostname, newNickName)  ":" + nickname + "!~" + username + "@" + hostname + " NICK :" + newNickName  + "\r\n"
 #define RPL_UMODEIS(hostname,client, user_modes) ":" + hostname + " 221 " + client + " " + user_modes + "\r\n"
 
@@ -188,10 +188,7 @@ class Client
 		State			state;
 		bool			_isoper;
 		bool			is_invisible;
-		
-		// bool			receives_wallops;
-		// bool			receives_server_notices;
-		
+
 	public:
 		Client(int fd, std::string host);
 		~Client();
@@ -274,6 +271,7 @@ class Channel
         long long get_nbr_client() const;
         long long get_max_client() const;
 		std::string getTopicTimestp() const;
+		void	changeNickName(std::string oldNickname,std::string newNickname);
 		void	eraseClient(std::string nickname);
 		bool getLimit()const;
 		bool getInviteOnly() const;
@@ -315,6 +313,7 @@ class Channel
 		void    inviteChannel(Client &c,std::string pass);
 		void	addMember(std::string const &name);
 		void	sendReplyAll(const std::string &msg, std::string nickname);
+		void	sendReplyAllNick(const std::string &msg,std::string nickname,int fd);
 };
 
 class Server

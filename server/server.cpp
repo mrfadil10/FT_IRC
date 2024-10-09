@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/08 23:23:19 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/09 16:04:07 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,7 @@ void	Server::handleMessage(int fd)
 	}
 	if(!del_break(_cmd).empty())
 		parseCmd(_cmd, *findClient(fd),fd);
-	displayClient();
+	// displayClient();
 }
 
 void	Server::parseCmd(std::string str, Client &cl,int fd)
@@ -790,6 +790,11 @@ void    Channel::setClientRole(std::string const &nickname, bool role)
 //         return 1;
 //     return 0;
 // }
+void	Channel::changeNickName(std::string oldNickname,std::string newNickname)
+{
+	client[newNickname] = client[oldNickname];
+	client.erase(oldNickname);
+}
 int Channel::checkIfIsClient(std::string const &nickname)
 {
     // std::map<Client*,bool>::iterator v = std::find(client.begin(),client.end(),c);
@@ -915,10 +920,25 @@ void	Channel::sendReplyAll(const std::string &msg,std::string nickname)
 		std::map<std::string,std::pair<bool,int> >::iterator it = client.begin();
 		while (it != client.end())
 		{
-			std::cout <<"kk "<< it->first<< std::endl;
-			if (it->first.compare(nickname) != 0)
+			if (it->first.compare(nickname) != 0 )
 			{
-				std::cout << it->first<< std::endl;
+				if(send(it->second.second, msg.c_str(), msg.length(), 0) < 0)
+					throw std::runtime_error("\033[1;91mError send.\033[0m");
+			}
+			it++;
+		}
+}
+void	Channel::sendReplyAllNick(const std::string &msg,std::string nickname,int fd)
+{
+		std::map<std::string,std::pair<bool,int> >::iterator it = client.begin();
+		std::vector<int> v;
+		v.push_back(fd);
+		while (it != client.end())
+		{
+			std::vector<int>::iterator i = std::find(v.begin(),v.end(),it->second.second);
+			if (it->first.compare(nickname) != 0 && i == v.end())
+			{
+				v.push_back(it->second.second);
 				if(send(it->second.second, msg.c_str(), msg.length(), 0) < 0)
 					throw std::runtime_error("\033[1;91mError send.\033[0m");
 			}

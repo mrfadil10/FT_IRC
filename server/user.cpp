@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:48:53 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/01 22:42:50 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/09 16:21:09 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int	Server::cmdUser(std::string cmds, Client &cl)
 {
+	if(cl.getState() != LOGIN)
+		return cl.reply(ERR_NOTREGISTERED(cl.getNickname(),cl.getHost())),1;
 	std::vector<std::string> args = splitCommands(del_break(cmds));
 	std::string	tmp;
 	std::string	cmd = args.at(0);
@@ -24,7 +26,7 @@ int	Server::cmdUser(std::string cmds, Client &cl)
 	}
 	else if (cl.getUsername() == args.at(1))
 	{
-		cl.reply("462 " + cl.getNickname() + " " + cmd + " :Unauthorized command (already registered)");
+		cl.reply(ERR_ALREADYREGISTERED(cl.getHost(),cl.getNickname()));
 		return (-1);
 	}
 	else if (args.size() >= 5)
@@ -54,5 +56,6 @@ int	Server::cmdUser(std::string cmds, Client &cl)
 		cl.setFullname(tmp);
 	}
 	cl.welcome();
+	displayClient();
 	return (0);
 }

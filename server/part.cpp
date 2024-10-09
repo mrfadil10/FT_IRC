@@ -43,6 +43,6 @@ int    Server::PART(std::string cmd, Client &c)
             }
         }
     }
-    
+    displayClient();
     return 0;
 }
