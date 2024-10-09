@@ -36,15 +36,15 @@ int    Server::KICK(std::string cmd, Client &c)
     for(size_t i = 0;i < vec.size();i++)
     {
         if(ch->findClientRole(c.getNickname()) == 0)
-            return c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target)),1;
-        if(ch->checkIfIsClient(vec.at(i)) == 0)
-        {
+            c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target));
+        else if(ch->checkIfIsClient(vec.at(i)) == 0)
             c.reply(ERROR_USERNOTINCHANNEL(c.getHost(),target,vec.at(i)));
-            continue;
+        else
+        {
+            c.reply(RPL_KICK(c.getNickname(),c.getUsername(),c.getHost(),target,vec.at(i),reason));
+            ch->sendReplyAll(RPL_KICK(c.getNickname(),c.getUsername(),c.getHost(),target,vec.at(i),reason),c.getNickname());
+            ch->removeClientNickName(vec.at(i));
         }
-        c.reply(RPL_KICK(c.getNickname(),c.getUsername(),c.getHost(),target,vec.at(i),reason));
-        ch->sendReplyAll(RPL_KICK(c.getNickname(),c.getUsername(),c.getHost(),target,vec.at(i),reason),c.getNickname());
-        ch->removeClientNickName(vec.at(i));
     }
     if(ch->get_nbr_client() == 0)
     {
