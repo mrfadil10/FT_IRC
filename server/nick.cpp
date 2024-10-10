@@ -31,8 +31,6 @@ bool	is_valid_nick(std::string name)
 	}
 	return (true);
 }
-
-
 std::string NICK_SUCCESS(std::string newNick)
 {
 	return ("\033[1;92mNICK " + newNick + "\033[0m\r\n");

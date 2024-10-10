@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/10 22:40:32 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/11 00:13:42 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,6 @@ int    Server::MODE(std::string cmd, Client &c)
         return c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target)),1;
     std::string nick = c.getNickname();
     std::vector<std::string>::iterator it = args.begin()+3;
-    char k = 'k';
     for(size_t i= 0; i < mode.size() ;i++)
     {
         if(mode[i] == '-') flag = false;
@@ -240,11 +239,8 @@ int    Server::MODE(std::string cmd, Client &c)
                 }
             }
             
-        }else if(k != mode[i])
-        {
-            k = mode[i];
+        }else
             c.reply(ERR_UNKNOWNMODE(c.getNickname(),c.getHost(),target,mode[i]));
-        }
     }
     if(!as.empty())
     {
