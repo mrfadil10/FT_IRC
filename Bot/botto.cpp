@@ -1,14 +1,8 @@
 #include "../includes/irc.hpp"
 #include <fstream>
 
-int bot_info(int fd_bot, std::string pass, std::string nick) {
-    std::string str;
-    str = "PASS " + pass + " " + "\r\n";
-    write(fd_bot, str.c_str(), str.length());
-    // str = std::string("USER bot bot bot bot ") + "\r\n";
-    // write(fd_bot, str.c_str(), str.length());
-    // str = "NICK " + nick + "\r\n";
-    // write(fd_bot, str.c_str(), str.length());
+int bot_info(int fd_bot, const std::string &cmd) {
+    write(fd_bot,cmd.c_str(),cmd.length());
     return 0;
 }
 
@@ -75,10 +69,15 @@ int main(int ac, char *av[]) {
         std::perror("connect");
         return EXIT_FAILURE;
     }
-    if (bot_info(fd_bot, pass, nick)) {
-        close(fd_bot);
-        return EXIT_FAILURE;
-    }
+    // if (bot_info(fd_bot,)) {
+    //     close(fd_bot);
+    //     return EXIT_FAILURE;
+    // }
+    bot_info(fd_bot, "PASS " + pass + "\r\n");
+    usleep(1000);
+    bot_info(fd_bot, "USER boot bot bot boot\r\n");
+    usleep(1000);
+    bot_info(fd_bot, "NICK bot\r\n");
     char buffer[512];
     std::string str, rr;
     while (1) {

@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/09 16:04:07 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/10 18:46:44 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,7 @@ void	Server::handleMessage(int fd)
 	}
 	if(!del_break(_cmd).empty())
 		parseCmd(_cmd, *findClient(fd),fd);
-	// displayClient();
+	displayClient();
 }
 
 void	Server::parseCmd(std::string str, Client &cl,int fd)
