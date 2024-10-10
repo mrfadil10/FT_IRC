@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:48:53 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/10 18:46:06 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/10 23:21:37 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,19 @@
 
 int	Server::cmdUser(std::string cmds, Client &cl)
 {
+	
 	std::vector<std::string> args = splitCommands(del_break(cmds));
-	std::string	tmp;
-	std::string	cmd = args.at(0);
 	if (args.size() < 5)
+		return cl.reply(ERR_NEEDMOREPARAMS(cl.getNickname(),cl.getHost(), "USER")),-1;
+	if (cl.getUsername() == args.at(1))
+		return cl.reply(ERR_ALREADYREGISTERED(cl.getHost(),cl.getNickname())),-1;
+	if(!cl.getLogin())
+        return cl.reply(ERR_NOTREGISTERED(cl.getNickname(),cl.getHost())),-1;
+	if(cl.getState() == REGISTERED)
+        return cl.reply(ERR_ALREADYREGISTERED(cl.getNickname(),cl.getHost())),-1;
+	if (args.size() >= 5)
 	{
-		cl.reply(ERROR_NEED_MORE_PARAMETERS(cl, "User"));
-		return (-1);
-	}
-	else if (cl.getUsername() == args.at(1))
-	{
-		cl.reply(ERR_ALREADYREGISTERED(cl.getHost(),cl.getNickname()));
-		return (-1);
-	}
-	else if (args.size() >= 5)
-	{
+		std::string	tmp;
 		size_t i;
 		cl.setUsername(args.at(1));
 		for (i = 1; i < args.size() - 1; i++)

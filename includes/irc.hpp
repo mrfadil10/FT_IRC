@@ -188,10 +188,13 @@ class Client
 		State			state;
 		bool			_isoper;
 		bool			is_invisible;
-
+		bool		    login;
 	public:
 		Client(int fd, std::string host);
 		~Client();
+
+		void	setLogin(bool);
+		bool	getLogin();
 		Client(const Client &c);
 		Client &operator=(const Client &c);
 		bool operator==(const Client &c)const;
@@ -326,6 +329,7 @@ class Server
 		std::map<std::string,Channel*>	_channels;
 		std::vector<pollfd>			_pollfds;
 		std::string					_password;
+	
 		
 	public:
 		Server(int port, std::string password);
@@ -333,7 +337,6 @@ class Server
 
 	int		createSocket();
 	void	launch();
-
 	void	handleMessage(int fd);
 	void	displayClient();
 	void							replys(Client &c,std::string msg);

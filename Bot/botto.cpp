@@ -77,7 +77,7 @@ int main(int ac, char *av[]) {
     usleep(700);
     bot_info(fd_bot, "USER boot bot bot boot\r\n");
     usleep(700);
-    bot_info(fd_bot, "NICK bot\r\n");
+    bot_info(fd_bot, "NICK "+nick+"\r\n");
     char buffer[512];
     std::string str, rr;
     while (1) {

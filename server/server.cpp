@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/10 18:46:44 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/10 23:16:11 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 Server::Server(int port, std::string password) :_port(port), _password(password)
 {
 	_sock = createSocket();
-	
 }
 
 Server::~Server() {
@@ -278,7 +277,14 @@ void	Server::handleMessage(int fd)
 		parseCmd(_cmd, *findClient(fd),fd);
 	displayClient();
 }
-
+void	Client::setLogin(bool b)
+{
+	this->login = b;
+}
+bool	Client::getLogin()
+{
+	return this->login;
+}
 void	Server::parseCmd(std::string str, Client &cl,int fd)
 {
     std::string	tmp;
@@ -351,6 +357,7 @@ Client::Client(int sockfd, std::string hostname) : sockfd(sockfd), host(hostname
 {
 	state = HANDSHAKE;
 	msg = "";
+	login = false;
 }
 
 Client::~Client() {}

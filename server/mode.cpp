@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/09 20:26:57 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/10 22:40:32 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,9 @@ long long	aatoi(const char * str)
 		if (std::isalpha(str[i]))
 			return (-2);
 		s = (s * 10) + (str[i] - '0');
-        s = s > INT_MAX ? INT_MAX : s;
+        s = s > LONG_MAX ? LONG_MAX : s;
 		i++;
 	}
-    
 	return (s);
 }
 int     invalidMode(std::string mode)
@@ -54,48 +53,25 @@ int     invalidMode(std::string mode)
 }
 std::string makeMode(std::string modeStr)
 {
-    std::set<char> addedModes;
-    std::set<char> removedModes;
-    char currentSign = '\0';
-    for (size_t i = 0; i < modeStr.size(); ++i) {
-        if (modeStr[i] == '+' || modeStr[i] == '-') {
-            currentSign = modeStr[i];
-        } else if (isalpha(modeStr[i]))
+    int n = modeStr[0] == '+' ? 1 : 0;
+    std::string resulta = n == 1 ? "+" : "-";
+    for (size_t i = 1; i < modeStr.size(); i++)
+    {
+        if(modeStr[i] != '+' && modeStr[i] != '-')
+            resulta += modeStr[i];
+        else if(modeStr[i] == '+' || modeStr[i] == '-')
         {
-            if (currentSign == '+') 
+            int m = modeStr[i] == '+' ? 1 : 0;
+            if(n == m)
+                continue;
+            else
             {
-                addedModes.insert(modeStr[i]);
-                removedModes.erase(modeStr[i]);
-            }
-            else if (currentSign == '-') 
-            {
-                removedModes.insert(modeStr[i]);
-                addedModes.erase(modeStr[i]);  
+                n = m;
+                resulta += modeStr[i];
             }
         }
     }
-    std::stringstream result;
-    std::stringstream addResult, removeResult;
-
-     if (!removedModes.empty()) 
-     {
-        removeResult << "-";
-        for (std::set<char>::iterator it = removedModes.begin(); it != removedModes.end(); ++it) 
-        {
-            removeResult << *it;
-        }
-    }
-
-    if (!addedModes.empty()) {
-        addResult << "+";
-        for (std::set<char>::iterator it = addedModes.begin(); it != addedModes.end(); ++it) {
-            addResult << *it;
-        }
-    }   
-    result << removeResult.str() << addResult.str();
-
-    return result.str();
-    
+    return resulta;
 }
 int    Server::MODE(std::string cmd, Client &c)
 {
@@ -135,6 +111,7 @@ int    Server::MODE(std::string cmd, Client &c)
         return c.reply(ERR_CHANOPRIVSNEEDED(c.getHost(),target)),1;
     std::string nick = c.getNickname();
     std::vector<std::string>::iterator it = args.begin()+3;
+    char k = 'k';
     for(size_t i= 0; i < mode.size() ;i++)
     {
         if(mode[i] == '-') flag = false;
@@ -216,7 +193,7 @@ int    Server::MODE(std::string cmd, Client &c)
                 }
                 else
                 {
-                    if(aatoi(it->c_str()) >= INT_MAX)
+                    if(aatoi(it->c_str()) > INT_MAX)
                     {
                         it++;
                         continue;
@@ -263,8 +240,11 @@ int    Server::MODE(std::string cmd, Client &c)
                 }
             }
             
-        }else
+        }else if(k != mode[i])
+        {
+            k = mode[i];
             c.reply(ERR_UNKNOWNMODE(c.getNickname(),c.getHost(),target,mode[i]));
+        }
     }
     if(!as.empty())
     {
