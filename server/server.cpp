@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/10 23:49:45 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/11 00:53:26 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -470,9 +470,12 @@ void	Client::welcome()
 	state = REGISTERED;
 	reply(REPLY_WELCOME(nick,username,host));
 	reply(REPLY_YOURHOST(nick,host));
-	// reply(REPLY_CREATED(nick,host,getTimeSc()));
-	// reply(REPLY_CREATED(nick,host,getStartTimestp()));
-	
+	time_t		creatchannelTime;
+	time(&creatchannelTime);
+	struct tm *tm_time = gmtime(&creatchannelTime);
+    char buffer[80];
+    strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S UTC", tm_time);
+	reply(REPLY_CREATED(nick,host,buffer));
 	std::cout << B_CYAN << nick << " is registered" << RESET << std::endl;
 }
 
