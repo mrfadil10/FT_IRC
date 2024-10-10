@@ -25,7 +25,7 @@ int is_privmsg(int fd_bot, std::string str, std::string nick) {
         } if (cmd == "joke") {
             std::string line;
             int rand_val = std::rand() % 20 + 1, i = 0;
-            std::ifstream f_joke("Bot/Jokes.txt");
+            std::ifstream f_joke("./Jokes.txt");
             if(f_joke.fail()) {
                 return 1;
             } while (getline(f_joke, line)) {
@@ -74,9 +74,9 @@ int main(int ac, char *av[]) {
     //     return EXIT_FAILURE;
     // }
     bot_info(fd_bot, "PASS " + pass + "\r\n");
-    usleep(1000);
+    usleep(700);
     bot_info(fd_bot, "USER boot bot bot boot\r\n");
-    usleep(1000);
+    usleep(700);
     bot_info(fd_bot, "NICK bot\r\n");
     char buffer[512];
     std::string str, rr;
