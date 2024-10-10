@@ -188,13 +188,10 @@ class Client
 		State			state;
 		bool			_isoper;
 		bool			is_invisible;
-		bool		    login;
 	public:
 		Client(int fd, std::string host);
 		~Client();
 
-		void	setLogin(bool);
-		bool	getLogin();
 		Client(const Client &c);
 		Client &operator=(const Client &c);
 		bool operator==(const Client &c)const;

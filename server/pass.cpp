@@ -32,7 +32,6 @@ int Server::cmdPass(std::string arg, Client &cl)
 	if (mdp != _password)
 		return cl.reply(ERR_PASSWDMISMATCH(cl.getNickname(),cl.getHost())),-1;
 	cl.setState(LOGIN);
-	cl.setLogin(true);
 	displayClient();
 	cl.welcome();
 	return (0);

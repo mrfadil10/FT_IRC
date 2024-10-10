@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:48:53 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/10 23:21:37 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/10 23:46:10 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,11 @@ int	Server::cmdUser(std::string cmds, Client &cl)
 		return cl.reply(ERR_NEEDMOREPARAMS(cl.getNickname(),cl.getHost(), "USER")),-1;
 	if (cl.getUsername() == args.at(1))
 		return cl.reply(ERR_ALREADYREGISTERED(cl.getHost(),cl.getNickname())),-1;
-	if(!cl.getLogin())
-        return cl.reply(ERR_NOTREGISTERED(cl.getNickname(),cl.getHost())),-1;
+	
 	if(cl.getState() == REGISTERED)
         return cl.reply(ERR_ALREADYREGISTERED(cl.getNickname(),cl.getHost())),-1;
+	if(cl.getState() != LOGIN)
+        return cl.reply(ERR_NOTREGISTERED(cl.getNickname(),cl.getHost())),-1;
 	if (args.size() >= 5)
 	{
 		std::string	tmp;
