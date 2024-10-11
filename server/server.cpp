@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/11 21:54:59 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/11 22:41:08 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,22 +168,22 @@ void	Server::displayClient()
 	std::cout << std::endl;
 	return ;
 }
-void	Server::deletChannelA(std::string nickName)
-{
-	std::map<std::string,Channel*>::iterator it = _channels.begin();
-	std::vector<std::string> channel;
-	while (it != _channels.end())
-	{
-		if(it->second->checkIfIsClient(nickName)  && it->second->get_nbr_client() == 1)
-			channel.push_back(it->first);
-		it++;
-	}
-	for (size_t i = 0; i < channel.size(); i++)
-	{
-		delete _channels[channel.at(0)];
-		_channels.erase(channel.at(0));
-	}
-}
+// void	Server::deletChannelA(std::string nickName)
+// {
+// 	std::map<std::string,Channel*>::iterator it = _channels.begin();
+// 	std::vector<std::string> channel;
+// 	while (it != _channels.end())
+// 	{
+// 		if(it->second->checkIfIsClient(nickName)  && it->second->get_nbr_client() == 1)
+// 			channel.push_back(it->first);
+// 		it++;
+// 	}
+// 	for (size_t i = 0; i < channel.size(); i++)
+// 	{
+// 		delete _channels[channel.at(0)];
+// 		_channels.erase(channel.at(0));
+// 	}
+// }
 void	Server::eraseClient(int fd)
 {
 	std::map<int,Client*>::iterator it = _clients.begin();
@@ -192,7 +192,7 @@ void	Server::eraseClient(int fd)
 	{
 		if (it->second->getFd() == fd)
 		{
-			deletChannelA(_clients[fd]->getNickname());
+			joinZero(*this->_clients[fd]);
 			delete this->_clients[fd];
 			_clients.erase(it);
 			return ;
