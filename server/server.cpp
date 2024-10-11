@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/11 22:41:08 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/11 23:25:22 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,6 +313,10 @@ void	Server::parseCmd(std::string str, Client &cl,int fd)
 			&Server::INVITE,
 			&Server::PRIVMSG
 	};
+	for (std::size_t i = 0; i < tmp.size(); ++i) {
+		if(std::isprint(tmp[i]))
+        	tmp[i] = std::toupper(tmp[i]); 
+    }
 	for (int i = 0; i <= 9; ++i)
 	{
 		if (del_break(tmp) == cmds[i])
@@ -321,7 +325,7 @@ void	Server::parseCmd(std::string str, Client &cl,int fd)
 			return ;
 		}
 	}
-	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str()),0);
+	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(_cmd))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(_cmd))).c_str()),0);
 }
  //else {
 //         cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
