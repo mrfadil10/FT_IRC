@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/11 21:35:52 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/11 21:54:59 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,6 @@ void	Server::deletChannelA(std::string nickName)
 		delete _channels[channel.at(0)];
 		_channels.erase(channel.at(0));
 	}
-	
 }
 void	Server::eraseClient(int fd)
 {
