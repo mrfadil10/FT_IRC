@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/11 23:25:22 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/11 23:48:29 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,6 +297,7 @@ void	Server::handleMessage(int fd)
 void	Server::parseCmd(std::string str, Client &cl,int fd)
 {
     std::string	tmp;
+    std::string	tmp1;
 	std::stringstream	ss(str);
 	std::getline(ss, tmp, ' ');
 	std::string cmds[10] = {"PASS", "NICK", "USER", "JOIN","MODE", "TOPIC", "KICK", "PART", "INVITE", "PRIVMSG"};
@@ -313,6 +314,7 @@ void	Server::parseCmd(std::string str, Client &cl,int fd)
 			&Server::INVITE,
 			&Server::PRIVMSG
 	};
+	tmp1 = tmp;
 	for (std::size_t i = 0; i < tmp.size(); ++i) {
 		if(std::isprint(tmp[i]))
         	tmp[i] = std::toupper(tmp[i]); 
@@ -325,7 +327,7 @@ void	Server::parseCmd(std::string str, Client &cl,int fd)
 			return ;
 		}
 	}
-	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(_cmd))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(_cmd))).c_str()),0);
+	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp1))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp1))).c_str()),0);
 }
  //else {
 //         cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
