@@ -47,9 +47,9 @@ bool	getport(char *ac, int &port)
 		std::cout << "Error input: port must contain only digits\r\n" << std::endl;
 		return (false);
 	}
-	if (port < 0 || port > 65535)
+	if (port < 1024 || port > 65535)
 	{
-		std::cout << "Error input: port is out of range [0; 65535]\r\n" << std::endl;
+		std::cout << "Error input: port is out of range [1024; 65535]\r\n" << std::endl;
 		return (false);
 	}
 	return (true);
@@ -73,6 +73,8 @@ int main(int ac, char **av)
 		return (1);
 	try
 	{
+		if(!av[2][0])
+			return 1;
 		Server server(port, av[2]);
 		server.launch();
 	}
