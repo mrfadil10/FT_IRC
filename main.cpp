@@ -35,24 +35,20 @@ void	signalHandler(int const signal)
 	g_interrupt = true;
 }
 
-bool	getport(char *ac, int &port)
+int	getport(std::string sport)
 {
-	char	*buffer;
-
-	if (*ac == '\0')
-		return (false);
-	port = strtol(ac, &buffer, 10);
-	if (*buffer != '\0')
+	if (sport.size() < 4 || sport.size() > 5)
 	{
-		std::cout << "Error input: port must contain only digits\r\n" << std::endl;
-		return (false);
+		return (-1);
 	}
-	if (port < 1024 || port > 65535)
+	for (size_t i = 0; i < sport.size(); i++)
 	{
-		std::cout << "Error input: port is out of range [1024; 65535]\r\n" << std::endl;
-		return (false);
+		if (sport[i] < '0' || sport[i] > '9')
+		{
+			return (-1);
+		}
 	}
-	return (true);
+	return (std::atoi(sport.c_str()));
 }
 void f()
 {
@@ -60,22 +56,36 @@ void f()
 }
 int main(int ac, char **av)
 {
-	int port;
-
 	signal(SIGINT, signalHandler);
 	signal(SIGQUIT, signalHandler);
 	if (ac != 3)
 	{
-		std::cout << "Usage: ./ircserv <port> <password>\r\n" << std::endl;
+		std::cout << "Usage: ./ircserv <port> <password>" << std::endl;
 		return (1);
 	}
-	if (getport(av[1], port) == false)
+	const std::string password = av[2];
+	for (size_t i = 0; i < password.size(); i++)
+	{
+		if (password[i] <= ' ' || password[i] > '~')
+		{
+			std::cout << "Error input: password must contain only printable characters" << std::endl;
+			return (1);
+		}
+	}
+	if ((password.size() < 2) || (password.size() > 8))
+	{
+		std::cout << "Error input: password must contain at least 2 characters" << std::endl;
 		return (1);
+	}
+	const int port = getport(av[1]);
+	if (port < 1024 || port > 65535)
+	{
+		std::cout << "Error input: port must be between 1024 and 65535" << std::endl;
+		return (-1);
+	}
 	try
 	{
-		if(!av[2][0])
-			return 1;
-		Server server(port, av[2]);
+		Server server(port, password);
 		server.launch();
 	}
 	catch (const std::exception &e)
