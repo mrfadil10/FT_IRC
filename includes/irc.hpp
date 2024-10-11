@@ -355,7 +355,7 @@ class Server
 	Client							*findClient(int fd);
 	int								findClientInS(std::string nickname);
 	std::map<int,Client*>::iterator	findClientIt(int fd);
-
+    void		deletChannelA(std::string nickName);
 	// IRC Commands...
 	int		MODE(std::string args, Client &c);
 	int		JOIN(std::string args, Client &c);

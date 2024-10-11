@@ -2,7 +2,6 @@
 
 int Server::cmdPass(std::string arg, Client &cl)
 {
-	
 	std::vector<std::string> pswrd = splitCommands(del_break(arg));
 	if (pswrd.size() < 2)
 		return cl.reply(ERR_NEEDMOREPARAMS(cl.getNickname(),cl.getHost(),"PASS")),-1;

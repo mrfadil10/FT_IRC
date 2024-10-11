@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/11 00:13:42 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/11 18:07:35 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int    Server::MODE(std::string cmd, Client &c)
         if(target[0] == '#')
             return c.reply(ERR_NOSUCHCHANNEL(c.getHost(),c.getNickname(),target)),1;
         if(c.getNickname().compare(target) == 0)
-            return c.reply(RPL_UMODEIS(c.getHost(),c.getNickname(),"+Zi")),1;
+            return c.reply(RPL_UMODEIS(c.getHost(),c.getNickname(),"+i")),1;
         if(getClientByNickNameS(target))
             return c.reply(ERR_USERSDONTMATCH(c.getHost(),c.getNickname())),1;
         return c.reply(ERR_NOSUCHNICK(c.getHost(),c.getNickname(),target)),1;
@@ -214,7 +214,6 @@ int    Server::MODE(std::string cmd, Client &c)
                 std::string f = flag == true ? "+":"-";
                 as+=f+"l";
             }
-            
         }
         else if(mode[i] ==  'o')
         {
