@@ -47,22 +47,24 @@ int Server::cmdNick(std::string cmd, Client& client)
 	if (is_used(client, requestedNick))
 		return (client.reply(ERR_NICKNAMEINUSE(client.getNickname(),client.getHost())), -1);
 	if(client.getState() == REGISTERED)
+	{
 		client.reply(RPL_NICKCHANGE(client.getNickname(),requestedNick,client.getUsername(),client.getHost()));
+		std::map<std::string,Channel*>::iterator it = _channels.begin();
+		while (it != _channels.end())
+		{
+			if(it->second->checkIfIsClient(client.getNickname()))
+			{
+				it->second->sendReplyAll(RPL_NICKCHANGE(client.getNickname(),requestedNick,client.getUsername(),client.getHost()),client.getNickname());
+				it->second->changeNickName(client.getNickname(),requestedNick);
+			}
+			it++;
+		}
+	}
 	else
 	{
 		if(client.getState() != LOGIN)
         	return client.reply(ERR_NOTREGISTERED(client.getNickname(),client.getHost())),-1;///bdloooh
 		client.reply(NICK_SUCCESS(requestedNick));
-	}
-	std::map<std::string,Channel*>::iterator it = _channels.begin();
-	while (it != _channels.end())
-	{
-		if(it->second->checkIfIsClient(client.getNickname()))
-		{
-			it->second->sendReplyAll(RPL_NICKCHANGE(client.getNickname(),requestedNick,client.getUsername(),client.getHost()),client.getNickname());
-			it->second->changeNickName(client.getNickname(),requestedNick);
-		}
-		it++;
 	}
 	client.setNickname(requestedNick);
 	displayClient();

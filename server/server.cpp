@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/12 16:22:07 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/13 00:18:11 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -940,7 +940,7 @@ void	Channel::sendReplyAll(const std::string &msg,std::string nickname)
 			if (it->first.compare(nickname) != 0 )
 			{
 				if(send(it->second.second, msg.c_str(), msg.length(), 0) < 0)
-					throw std::runtime_error("\033[1;91mError send.\033[0m");
+					return;
 			}
 			it++;
 		}
