@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/11 23:48:29 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/12 16:22:07 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,37 +297,32 @@ void	Server::handleMessage(int fd)
 void	Server::parseCmd(std::string str, Client &cl,int fd)
 {
     std::string	tmp;
-    std::string	tmp1;
 	std::stringstream	ss(str);
 	std::getline(ss, tmp, ' ');
-	std::string cmds[10] = {"PASS", "NICK", "USER", "JOIN","MODE", "TOPIC", "KICK", "PART", "INVITE", "PRIVMSG"};
+	std::string cmdu[10] = {"PASS", "NICK", "USER", "JOIN","MODE", "TOPIC", "KICK", "PART", "INVITE", "PRIVMSG"};
+	std::string cmds[10] = {"pass", "nick", "user", "join","mode", "topic", "kick", "part", "invite", "privmsg"};
 
 	int		(Server::*ptr[10])(std::string , Client &cl) = {
 			&Server::cmdPass,
 			&Server::cmdNick,
 			&Server::cmdUser,
 			&Server::JOIN,
-			&Server::MODE, 
+			&Server::MODE,
 			&Server::TOPIC,
 			&Server::KICK,
 			&Server::PART,
 			&Server::INVITE,
 			&Server::PRIVMSG
 	};
-	tmp1 = tmp;
-	for (std::size_t i = 0; i < tmp.size(); ++i) {
-		if(std::isprint(tmp[i]))
-        	tmp[i] = std::toupper(tmp[i]); 
-    }
 	for (int i = 0; i <= 9; ++i)
 	{
-		if (del_break(tmp) == cmds[i])
+		if (del_break(tmp) == cmds[i] || del_break(tmp) == cmdu[i])
 		{
 			(this->*ptr[i])(del_break(_cmd), cl);
 			return ;
 		}
 	}
-	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp1))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp1))).c_str()),0);
+	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str()),0);
 }
  //else {
 //         cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
