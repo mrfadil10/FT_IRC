@@ -3,6 +3,7 @@
 #include <ctime>
 # include <iostream>
 # include <vector>
+# include <fstream>
 # include <sstream>
 # include <sys/socket.h>
 # include <algorithm>
@@ -22,7 +23,7 @@
 # include <cerrno>
 # include <signal.h>
 #include <set>
-#include <algorithm> 
+#include <algorithm>
 
 #include <stdlib.h>
 // #include "Channel.hpp"
@@ -80,7 +81,7 @@
 #define RPL_UMODEIS(hostname,client, user_modes) ":" + hostname + " 221 " + client + " " + user_modes + "\r\n"
 
 #define RPL_CREATIONTIME(hostname,nickname,channelName,creationTime) ":" + hostname + " 329 " + nickname + " " + channelName + " " + creationTime+"\r\n"
-/// join 
+/// join
 #define RPL_INVITING(hostname,nick,target_nick,channel) ":"+hostname+" 341 "+nick+" "+target_nick+" "+ channel +"\r\n"
 #define RPL_NOTOPIC(hostname,nick,channelname)":"+hostname+" 331 " +nick+ " " + channelname + " :no topic is set\r\n"
 #define RPL_ENDOFNAMES(hostname, nick, channelname) ":" + hostname + " 366 " + nick + " " + channelname + " :END of /NAMES list\r\n"
@@ -233,8 +234,8 @@ class Server
 		std::map<std::string,Channel*>	_channels;
 		std::vector<pollfd>			_pollfds;
 		std::string					_password;
-	
-		
+
+
 	public:
 		Server(int port, std::string password);
 		~Server();
@@ -272,7 +273,7 @@ class Server
 	int cmdUser(std::string args, Client &cl);
 	int cmdNick(std::string args, Client &cl);
 	int cmdPass(std::string args, Client &cl);
-	
+
 };
 
 // utils
