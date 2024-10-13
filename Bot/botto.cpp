@@ -1,5 +1,4 @@
 #include "../includes/irc.hpp"
-#include <fstream>
 
 int bot_info(int fd_bot, const std::string &cmd) {
     write(fd_bot,cmd.c_str(),cmd.length());
@@ -25,7 +24,7 @@ int is_privmsg(int fd_bot, std::string str, std::string nick) {
         } if (cmd == "joke") {
             std::string line;
             int rand_val = std::rand() % 20 + 1, i = 0;
-            std::ifstream f_joke("./Jokes.txt");
+            std::ifstream f_joke("./Bot/Jokes.txt");
             if(f_joke.fail()) {
                 return 1;
             } while (getline(f_joke, line)) {
