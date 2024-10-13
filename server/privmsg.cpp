@@ -1,4 +1,5 @@
-#include "../includes/irc.hpp"
+
+#include "../includes/Server.hpp"
 
 std::vector<std::string> splitByComa(const std::string& str) {
     std::vector<std::string> result;

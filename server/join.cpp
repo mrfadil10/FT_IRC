@@ -1,5 +1,6 @@
 
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
+
 std::vector<std::string> splitChannelandKey(std::string msg)
 {
 	std::vector<std::string>	cmd;

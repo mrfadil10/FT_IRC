@@ -1,4 +1,4 @@
-#include "includes/irc.hpp"
+#include "./includes/Server.hpp"
 
 bool	g_interrupt = false;
 

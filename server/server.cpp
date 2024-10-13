@@ -6,11 +6,11 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/13 20:27:38 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/13 23:20:45 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
 
 Server::Server(int port, std::string password) :_port(port), _password(password)
 {

@@ -4,7 +4,7 @@ BONUS_NAME = botto
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98
 
-HEADER = ./includes/irc.hpp
+HEADER = ./includes/Server.hpp ./includes/Reply.hpp ./includes/Client.hpp ./includes/Channel.hpp 
 
 RED = \033[1;91m
 GREEN = \033[1;92m
@@ -32,7 +32,7 @@ BONUS_OBJS = $(BONUS_SRC:%.cpp=$(OBJS_DIR)%.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(HEADER)
 	@echo "$(GREEN)ボクはアルベド、西風騎士団の首席錬金術師だ。\n\
 	キミから感じる星海の気配に興味があってね、近くで観察したいと思ったんだ。\n\
 	きっとこれから一緒に行動する機会が増えると思うよ。いい景色だね。休憩中にこの景色を絵にしようか。\n\
@@ -70,7 +70,7 @@ $(NAME): $(OBJS)
 
 $(OBJS_DIR)%.o: %.cpp $(HEADER)
 	@mkdir -p $(OBJS_DIR)server $(OBJS_DIR)Bot
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 bonus: $(BONUS_OBJS)
 	@echo "$(RED)Compiling bonus...$(RESET)⏳"

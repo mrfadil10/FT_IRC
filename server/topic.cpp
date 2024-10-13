@@ -1,4 +1,4 @@
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
 
 std::vector<std::string> splitCommandsT(std::string msg)
 {

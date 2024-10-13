@@ -1,4 +1,4 @@
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
 
 int Server::cmdPass(std::string arg, Client &cl)
 {

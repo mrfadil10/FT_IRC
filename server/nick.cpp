@@ -1,4 +1,4 @@
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
 
 bool	Server::is_used(Client cl, std::string name)
 {

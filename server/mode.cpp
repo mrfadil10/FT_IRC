@@ -1,17 +1,5 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   mode.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/13 18:03:44 by ibenaait         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
-// #include "Channel.hpp"
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
 
 long long	aatoi(const char * str)
 {

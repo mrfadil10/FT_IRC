@@ -1,5 +1,5 @@
 
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
 
 int    Server::INVITE(std::string cmd, Client &c)
 {
