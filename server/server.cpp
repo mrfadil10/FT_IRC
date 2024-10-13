@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 17:28:00 by mfadil            #+#    #+#             */
-/*   Updated: 2024/10/13 00:18:11 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/13 17:12:52 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,15 +67,8 @@ std::string	Client::getHost() const {
 State	Client::getState() const {
 	return (state);
 }
-bool	Client::getIsOper() const {
-	return (_isoper);
-}
 
-// setters
-void		Client::setIsOperator(bool ischeck)
-{
-	_isoper = ischeck;
-}
+
 void	Client::setUsername(std::string _new) {
 	username = _new;
 }
@@ -96,9 +89,6 @@ void	Client::setState(State Newstate) {
 	state = Newstate;
 }
 
-void	Client::setIsoper(bool Newstate) {
-	_isoper = Newstate;
-}
 
 void	Client::addMsg(std::string message) {
 	msg += message;
@@ -168,22 +158,22 @@ void	Server::displayClient()
 	std::cout << std::endl;
 	return ;
 }
-// void	Server::deletChannelA(std::string nickName)
-// {
-// 	std::map<std::string,Channel*>::iterator it = _channels.begin();
-// 	std::vector<std::string> channel;
-// 	while (it != _channels.end())
-// 	{
-// 		if(it->second->checkIfIsClient(nickName)  && it->second->get_nbr_client() == 1)
-// 			channel.push_back(it->first);
-// 		it++;
-// 	}
-// 	for (size_t i = 0; i < channel.size(); i++)
-// 	{
-// 		delete _channels[channel.at(0)];
-// 		_channels.erase(channel.at(0));
-// 	}
-// }
+void	Server::deletChannelA(std::string nickName)
+{
+	std::map<std::string,Channel*>::iterator it = _channels.begin();
+	std::vector<std::string> channel;
+	while (it != _channels.end())
+	{
+		if(it->second->checkIfIsClient(nickName)  && it->second->get_nbr_client() == 1)
+			channel.push_back(it->first);
+		it++;
+	}
+	for (size_t i = 0; i < channel.size(); i++)
+	{
+		delete _channels[channel.at(0)];
+		_channels.erase(channel.at(0));
+	}
+}
 void	Server::eraseClient(int fd)
 {
 	std::map<int,Client*>::iterator it = _clients.begin();
@@ -192,7 +182,7 @@ void	Server::eraseClient(int fd)
 	{
 		if (it->second->getFd() == fd)
 		{
-			joinZero(*this->_clients[fd]);
+			deletChannelA(it->second->getNickname());
 			delete this->_clients[fd];
 			_clients.erase(it);
 			return ;
@@ -324,20 +314,7 @@ void	Server::parseCmd(std::string str, Client &cl,int fd)
 	}
 	send(fd,(ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str(),strlen((ERR_UNKNOWNCOMMAND(cl.getHost(),cl.getNickname(),del_break(tmp))).c_str()),0);
 }
- //else {
-//         cl.reply(ERR_UNKNOWNCOMMAND(cl.getHost(), cl.getNickname(), del_break(str)));
-//     }
-// }
-
-// Client		&Server::findClient(std::string nickname)
-// {
-// 	for (unsigned int i = 0; i < _clients.size(); i++)
-// 	{
-// 		if (_clients[i].getNickname() == nickname)
-// 			return (_clients[i]);
-// 	}
-// 	throw (std::out_of_range("\033[1;91mError while searching for user1\033[0m"));
-// }
+ 
 int		Server::findClientInS(std::string nickname)
 {
 	std::map<int,Client*>::iterator cl = _clients.begin();
@@ -355,15 +332,10 @@ Client		*Server::findClient(int fd)
 	std::map<int,Client*>::iterator cl = _clients.find(fd);
 	if(cl != _clients.end())
 		return cl->second;
-	// for (unsigned int i = 0; i < _clients.size(); i++)
-	// {
-	// 	if (_clients[i].getFd() == fd)
-	// 		return (_clients[i]);
-	// }
 	return NULL;
 }
 
-Client::Client(int sockfd, std::string hostname) : sockfd(sockfd), host(hostname), _isoper(false)
+Client::Client(int sockfd, std::string hostname) : sockfd(sockfd), host(hostname)
 {
 	state = HANDSHAKE;
 	msg = "";
@@ -371,64 +343,14 @@ Client::Client(int sockfd, std::string hostname) : sockfd(sockfd), host(hostname
 
 Client::~Client() {}
 
-Client::Client(const Client &c)
-{
-	*this = c;
-}
-Client &Client::operator=(const Client &c)
-{
-	if(this != &c)
-	{
-		this->nick = c.nick;
-		this->fullname = c.fullname;
-		this->username = c.username;
-		this->host = c.host;
-		this->state = c.state;
-		this->sockfd = c.sockfd;
-		this->_isoper = c._isoper;
-		this->is_invisible = c.is_invisible;
-		this->msg = c.msg;
-	}
-	return *this;
-}
-// bool Client::operator!=(const Client& c)const
-// {
-// 	return (this->nick != c.nick ||
-//             this->fullname != c.fullname ||
-//             this->username != c.username ||
-//             this->host != c.host ||
-//             this->state != c.state ||
-//             this->sockfd != c.sockfd ||
-//             this->_isoper != c._isoper ||
-//             this->is_invisible != c.is_invisible ||
-//             this->msg != c.msg);
-// }
-bool Client::operator==(const Client& c) const {
-    return (this->getNickname() == c.getNickname() && this->getUsername() ==c.getUsername());
-}
-bool Client::operator<=(const Client& c) const {
-        return ((this->getNickname() < c.getNickname() && this->getUsername() < c.getUsername()) \
-		 || (this->getNickname() == c.getNickname() && this->getUsername() == c.getUsername()));
-}
-bool Client::operator>=(const Client& c) const {
-        return ((this->getNickname() > c.getNickname() && this->getUsername() > c.getUsername()) \
-		 || (this->getNickname() == c.getNickname() && this->getUsername() == c.getUsername()));
-}
-bool Client::operator<(const Client& c) const {
-        return !((this->getNickname() < c.getNickname() && this->getUsername() < c.getUsername()));
-}
 std::string Client::getPrefix()
 {
 	std::string prefix = ":" + nick + (username.empty() ? "" : "!" + username) + (host.empty() ? "" : "@" + host);
 	return (prefix);
 }
-void	Channel::eraseClient(std::string nickname)
-{
-	client.erase(nickname);
-}
+
 void	Client::reply(std::string msg)
 {
-	// std::cout << I_GREEN << "----> " << msg << RESET << std::endl;
 	if (send(sockfd, msg.c_str(), msg.length(), 0) < 0)
 		throw (std::runtime_error("\033[1;91mError while sending message\033[0m"));
 }
@@ -496,41 +418,6 @@ void	Client::welcome()
 	std::cout << B_CYAN << nick << " is registered" << RESET << std::endl;
 }
 
-///////////////////////////////////////////////////////////
-void		Client::setIsInvisible(bool ischeck)
-{
-	is_invisible = ischeck;
-}
-// void		Client::setReceivesServerNotices(bool ischeck)
-// {
-// 	receives_server_notices = ischeck;
-// }
-// void		Client::setReceivesWallops(bool ischeck)
-// {
-// 	receives_wallops = ischeck;
-// }
-
-// //////////////////////////
-// bool		Client::getIsInvisible() const
-// {
-// 	return (is_invisible);
-// }
-// bool		Client::getReceivesServerNotices() const
-// {
-// 	return (receives_server_notices);
-// }
-// bool		Client::getReceivesWallops() const
-// {
-// 	return(receives_wallops);
-// }
-
-
-////
-
-
-//// server channel function
-////
-
 Channel	*Server::getChannel(std::string &target)
 {
 	std::map<std::string,Channel*>::iterator i = _channels.find(target);
@@ -538,25 +425,12 @@ Channel	*Server::getChannel(std::string &target)
 		return i->second;
 	return NULL;
 }
-// int comparison(std::string a,std::string b)
-// {
-// 	int s = 0;
-// 	if(a.size()>= b.size())
-// 	{
-// 		for (size_t i = 0; i < a.size(); i++)
-// 		{
-// 			if(a[i] >= b[i])
-// 				s = a[i] - b[i];
-// 		}
-		
-// 	}
-// }
+
 int     Server::checkIfChannelExist(std::string &target)
 {
     std::map<std::string,Channel*>::iterator i = _channels.find(target);
 	if(i != _channels.end())
 		return 1;
-	// return NULL;
 	return 0;
 }
 void    Channel::removeClientNickName(std::string const &nickname)
@@ -564,28 +438,19 @@ void    Channel::removeClientNickName(std::string const &nickname)
 	this->client.erase(nickname);
 	this->invite.erase(nickname);
 }
-// void	Server::set_Channel(Channel const &ch)
-// {
-// 	_channels.push_back(ch);
-// }
-/////client 
 
-////
 std::string getTimeSc()
 {
-        // Check if creatchannelTime is valid
-		time_t		creatchannelTime;
-		std::stringstream		ss;
-		time(&creatchannelTime);
-		ss << creatchannelTime;
-
+	time_t		creatchannelTime;
+	std::stringstream		ss;
+	time(&creatchannelTime);
+	ss << creatchannelTime;
     return ss.str();
 
 }
 
 Channel::Channel(std::string _name,std::string password):name(_name),password(password)
 {
-	// mode = 0;
 	isKey = password.size() == 0 ? false : true;
 	if(isKey)
 		mode.insert('k');
@@ -644,92 +509,6 @@ void Channel::setTime(std::string const &time)
 	this->timeScCh = time;
 }
 
-// std::string getTime()
-// {
-//         // Check if creatchannelTime is valid
-// 		time_t		creatchannelTime;
-// 		std::stringstream		ss;
-// 		// time(&creatchannelTime);
-//         // if (creatchannelTime == -1) {
-//         //     return "Error: Invalid time value";
-//         // }
-
-//         // // Convert to UTC using gmtime()
-// 		// // std::cout <<"ok ss  "<< creatchannelTime<<std::endl;
-//         // struct tm* gmTime = gmtime(&creatchannelTime);
-//         // if (gmTime == NULL) {
-//         //     return "Error: Failed to convert to UTC";
-//         // }
-
-//         // // Format the time to YYYY-MM-DD HH:MM:SS
-//         // char buffer[30];
-//         // strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmTime);
-
-//         // // Append milliseconds as ".000"
-//         // std::string result(buffer);
-//     	// result += ".000";
-// 		// std::stringstream ss;
-// 		ss << creatchannelTime;
-
-//     return ss.str();
-
-// }
-
-Channel::Channel(const Channel &c)
-{
-    *this  = c;
-}
-// std::string Client::getStartTimestp() const {
-//     std::stringstream ss;
-//     ss << this->creatServerTime;
-// 	struct tm timeinfo;
-//     memset(&timeinfo, 0, sizeof(struct tm));
-
-//     // Parse the input string
-//     if (sscanf(ss.str().c_str(), "%d-%d-%d %d:%d:%d",
-//                &timeinfo.tm_year, &timeinfo.tm_mon, &timeinfo.tm_mday,
-//                &timeinfo.tm_hour, &timeinfo.tm_min, &timeinfo.tm_sec) != 6) {
-//         return "Error: Invalid time format";
-//     }
-
-//     // Adjust the parsed values
-//     timeinfo.tm_year -= 1900;  // Year is years since 1900
-//     timeinfo.tm_mon -= 1;      // Month is 0-11
-
-//     // Convert to time_t
-//     time_t rawtime = mktime(&timeinfo);
-//     if (rawtime == -1) {
-//         return "Error: Failed to convert time";
-//     }
-
-//     // Convert to UTC
-//     struct tm* gmTime = gmtime(&rawtime);
-//     if (gmTime == NULL) {
-//         return "Error: Failed to convert to UTC";
-//     }
-
-//     // Format for IRC server time
-//     char buffer[30];
-//     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmTime);
-
-//     // Append ".000" for milliseconds (IRC format)
-//     std::string result(buffer);
-//     result += ".000";
-
-//     return result;
-// }
-Channel& Channel::operator=(const Channel& other) {
-    if (this != &other) {
-		name = other.name;
-		password = other.password;
-		topic = other.topic;
-		client.clear();
-		client.insert(other.client.begin(),other.client.end());
-		invite.clear();
-		invite.insert(other.invite.begin(),other.invite.end());
-    }
-    return *this;
-}
 
 bool	Channel::getLimit() const
 {
@@ -791,22 +570,13 @@ void Channel::setLimit(bool l)
 {
 	islimit  = l;
 }
-// void Channel::setMode(char c)
-// {
-// 	mode.insert(c);
-// }
+
 void    Channel::setClientRole(std::string const &nickname, bool role)
 {
     std::map<std::string,std::pair<bool,int> >::iterator v = client.find(nickname);
 	v->second.first = role;
 }
-// int Channel::checkIfIsInvite(const Client &c)
-// {
-//     std::map<std::string,int>::iterator v = invite.find(c.getNickname());
-//     if(v != invite.end())
-//         return 1;
-//     return 0;
-// }
+
 void	Channel::changeNickName(std::string oldNickname,std::string newNickname)
 {
 	client[newNickname] = client[oldNickname];
@@ -814,21 +584,11 @@ void	Channel::changeNickName(std::string oldNickname,std::string newNickname)
 }
 int Channel::checkIfIsClient(std::string const &nickname)
 {
-    // std::map<Client*,bool>::iterator v = std::find(client.begin(),client.end(),c);
 	if(client.find(nickname) != client.end())
         return 1;
     return 0;
 }
-// void Channel::allClientInChannel()
-// {
-// 	std::map<Client *,bool>::iterator it = client.begin();
-// 	while (it != client.end())
-// 	{
-// 		std::cout << I_GREEN << "----> " << it->first->getNickname() +" "<< it->second<<std::endl;
-// 		it++;
-// 	}
-	
-// }
+
 int Channel::checkIfIsClientNickName(std::string name)
 {
     std::map<std::string,std::pair<bool,int> >::iterator v = client.find(name);
@@ -847,32 +607,7 @@ int Channel::findClientRole(std::string nikname)
 void Channel::addClient(int fd, const std::string& nickname, bool isOperator) {
         client[nickname] = std::pair<bool,int>(isOperator,fd);
     }
-// void    Channel::inviteChannel(Client &c,std::string pass)
-// {
-// 	if(checkIfIsClient(c))
-// 		throw(1);
-// 	if(getInviteOnly() == true && !checkIfInviteToChannel(c))
-// 		throw(3);
-// 	if(get_max_client() != -1 && get_max_client() > get_nbr_client())
-// 		throw(2);
-//     else
-//     {
-// 		if(getKey() == false && password.compare(pass))
-// 			throw(4);
-// 		client[&c] = false;
-//         nbr_client++;
-//     }
-// }
-// void		Channel::addMember(std::string const &name)
-// {
-// 	client[name] = true;
-// 	nbr_client++;
-// }
-// void		Channel::setClient(std::string const &name,bool Role)
-// {
-// 	client[name] = Role;
-// 	nbr_client++;
-// }
+
 int	Channel::checkIfInviteToChannel(Client &c)
 {
 	std::map<std::string,int>::iterator v = invite.find(c.getNickname());
@@ -880,25 +615,8 @@ int	Channel::checkIfInviteToChannel(Client &c)
 		return 1;
 	return 0;
 }
-// void    Channel::ft_rm_client(Client &c)
-// {
-//     if(checkIfIsClient(c) == 0)
-//     {
-// 		std::map<std::string,bool>::iterator it = client.find(c.getNickname());
-//         client.erase(it);
-//     }
-// }
 
-void Channel::getMemberOp()
-{
-	std::vector<Client*>::iterator i ;
-	// for ( i = client.begin(); i != client.end(); i++)
-	// {
-	// 	// f  =  i->getIsOper() ? 1: 0;
-	// 	// std::cout << i->getFullname() +" "<< i->getNickname()+" "<< i->getIsOper()<<std::endl;
-	// }
-	
-}
+
 Client		*Server::getClientByNickNameS(std::string Nickname)
 {
 	std::map<int,Client*>::iterator it = _clients.begin();
@@ -924,14 +642,7 @@ std::string	Channel::get_list_of_names()
 	}
 	return names;
 }
-// void	Channel::setFdClien(int fd)
-// {
-// 	this->fdClient.push_back(fd);
-// 	for (size_t i = 0; i < this->fdClient.size(); i++)
-// 	{
-// 		std::cout <<"fd =1===="<< this->fdClient.at(i)<<std::endl;
-// 	}
-// }
+
 void	Channel::sendReplyAll(const std::string &msg,std::string nickname)
 {
 		std::map<std::string,std::pair<bool,int> >::iterator it = client.begin();
@@ -945,28 +656,7 @@ void	Channel::sendReplyAll(const std::string &msg,std::string nickname)
 			it++;
 		}
 }
-void	Channel::sendReplyAllNick(const std::string &msg,std::string nickname,int fd)
-{
-		std::map<std::string,std::pair<bool,int> >::iterator it = client.begin();
-		std::vector<int> v;
-		v.push_back(fd);
-		while (it != client.end())
-		{
-			std::vector<int>::iterator i = std::find(v.begin(),v.end(),it->second.second);
-			if (it->first.compare(nickname) != 0 && i == v.end())
-			{
-				v.push_back(it->second.second);
-				if(send(it->second.second, msg.c_str(), msg.length(), 0) < 0)
-					throw std::runtime_error("\033[1;91mError send.\033[0m");
-			}
-			it++;
-		}
-}
 
-// void	Server::replys(const Client &c, const std::string &msg)
-// {
-// 	send(c.getFd(), msg.c_str(), strlen(msg.c_str()), 0);
-// }
 void Channel::setMode(char s)
 {
 	this->mode.insert(s);
@@ -1001,32 +691,3 @@ std::string Channel::getMode(int i)
 bool Channel::hasMode(char mode) const {
     return this->mode.find(mode) != this->mode.end();
 }
-//  std::string Channel::get_mode_string() const {
-//         std::string modeStr = "+";
-//         if (mode & MODE_OPERATOR_PRIV) modeStr += "o";
-//         if (mode & MODE_INVITE_ONLY) modeStr += "i";
-//         if (mode & MODE_PROTECTED_TOPIC) modeStr += "t";
-//         if (mode & MODE_CLIENT_LIMIT) modeStr += "l";
-//         if (mode & MODE_KEY) modeStr += "k";
-//         return modeStr;
-//     }
-// std::string NICK_SUCCESSS(std::string newNick)
-// {
-// 	return ("\033[1;92mNICK " + newNick + "\033[0m");
-// }
-// void			Server::getAllChannelAddByClient(Client &c,std::string oldnick,std::string newnick)
-// {
-// 	std::vector<Channel>::iterator it = _channels.begin();
-// 	// std::cout << "OK!!!   "+_channels.size()+"!!\n";
-// 	while (it != _channels.end())
-// 	{
-// 		if(it->checkIfIsClient(c))
-// 		{
-// 			// std::cout <<RPL_NICKCHANGE(oldnick,newnick,(*it).get_list_of_names(),c.getHost())<< " "<< newnick<<std::endl;
-// 			it->sendReplyAll(RPL_NICKCHANGE(oldnick,newnick,(*it).get_list_of_names(),c.getHost()),oldnick);
-// 		}
-// 		it++;
-// 	}
-	
-// }
-	
