@@ -1,21 +1,6 @@
 
 #include "../includes/irc.hpp"
 
-// std::vector<std::string> splitNickNameAA(std::string msg)
-// {
-// 	// int					i = 0;
-// 	std::vector<std::string>	cmd;
-//     // std::cout << msg << std::endl;
-// 	std::stringstream	str(msg);
-// 	std::string				tm;
-// 	if (msg == "\n")
-// 		return (cmd);
-//     while (std::getline(str, tm, ','))
-// 	{
-// 		cmd.push_back(del_break(tm));
-// 	}
-// 	return (cmd);
-// }
 int    Server::INVITE(std::string cmd, Client &c)
 {
     if(c.getState() != REGISTERED)
