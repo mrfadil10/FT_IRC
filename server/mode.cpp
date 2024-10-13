@@ -6,7 +6,7 @@
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/17 14:34:13 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/11 18:07:35 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/13 18:03:44 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ long long	aatoi(const char * str)
 		if (std::isalpha(str[i]))
 			return (-2);
 		s = (s * 10) + (str[i] - '0');
-        s = s > LONG_MAX ? LONG_MAX : s;
+        s = s > INT_MAX ? INT_MAX : s;
 		i++;
 	}
 	return (s);
@@ -57,9 +57,7 @@ std::string makeMode(std::string modeStr)
     std::string resulta = n == 1 ? "+" : "-";
     for (size_t i = 1; i < modeStr.size(); i++)
     {
-        if(modeStr[i] != '+' && modeStr[i] != '-')
-            resulta += modeStr[i];
-        else if(modeStr[i] == '+' || modeStr[i] == '-')
+        if(modeStr[i] == '+' || modeStr[i] == '-')
         {
             int m = modeStr[i] == '+' ? 1 : 0;
             if(n == m)
@@ -69,7 +67,8 @@ std::string makeMode(std::string modeStr)
                 n = m;
                 resulta += modeStr[i];
             }
-        }
+        }else
+            resulta += modeStr[i];
     }
     return resulta;
 }
@@ -174,6 +173,10 @@ int    Server::MODE(std::string cmd, Client &c)
                 std::string f = flag == true ? "+":"-";
                 as+=f+"t";
                 ch->setChTopOp(flag);
+                if(flag)
+                    ch->setMode('t');
+                else
+                    ch->eraseMode('t');
             }
         }
         else if(mode[i] == 'l')
@@ -192,7 +195,7 @@ int    Server::MODE(std::string cmd, Client &c)
                 }
                 else
                 {
-                    if(aatoi(it->c_str()) > INT_MAX)
+                    if(aatoi(it->c_str()) >= INT_MAX)
                     {
                         it++;
                         continue;
