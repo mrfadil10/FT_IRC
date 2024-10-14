@@ -4,7 +4,7 @@ BONUS_NAME = botto
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 #-g -fsanitize=address
 
-HEADER = ./includes/Server.hpp ./includes/Reply.hpp ./includes/Client.hpp ./includes/Channel.hpp 
+HEADER = ./includes/Server.hpp ./includes/Reply.hpp ./includes/Client.hpp ./includes/Channel.hpp
 
 RED = \033[1;91m
 GREEN = \033[1;92m
@@ -73,9 +73,9 @@ $(OBJS_DIR)%.o: %.cpp $(HEADER)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 bonus: $(BONUS_OBJS)
-	@echo "$(RED)Compiling bonus...$(RESET)⏳"
+	@echo "$(RED)Compiling Bot...$(RESET)⏳"
 	@$(CC) $(CFLAGS) $(BONUS_OBJS) -o $(BONUS_NAME)
-	@echo "$(GREEN)Bonus executable is ready$(RESET)✅"
+	@echo "$(GREEN)Bot is ready$(RESET)✅"
 
 clean:
 	@echo "$(YELLOW)Cleaning up object files$(RESET)❌"

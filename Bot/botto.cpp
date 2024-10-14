@@ -1,11 +1,11 @@
 #include "../includes/Server.hpp"
 
-int bot_info(int fd_bot, const std::string &cmd) {
+int bot_auth(int fd_bot, const std::string &cmd) {
     write(fd_bot,cmd.c_str(),cmd.length());
     return 0;
 }
 
-int is_privmsg(int fd_bot, std::string str, std::string nick) {
+int check_msg(std::string str, std::string nick, int fd_bot) {
         std::string cmd;
         size_t indx = str.find(" "), i = 0;
         while(indx != str.npos) {
@@ -44,56 +44,66 @@ int is_privmsg(int fd_bot, std::string str, std::string nick) {
         return 0;
 }
 
-int main(int ac, char *av[]) {
-    if (ac != 5) {
-        std::cout << "U must folow this steps : address -> port -> nickname -> password .\nTry Again.. :/" << std::endl;
-        return EXIT_FAILURE;
+void f()
+{
+	system("leaks ircserv");
+}
+
+int main(int ac, char *av[])
+{
+    if (ac != 5)
+	{
+		std::cerr << RED <<"Usage: " << av[0] << " <ip> <port> <nick> <password>" << RESET << std::endl;
+        return 1;
     }
     int fd_bot = 0;
-    std::string pass = av[4];
     std::string nick = av[3];
-    struct sockaddr_in __bot;
-    std::cout << "The Bot will be Installed on the Server with Nick_Name : \" " << nick << " \", Enjoy ;)" << std::endl;
+    std::string password = av[4];
+    struct sockaddr_in _bot;
+	std::srand(time(0));
+	std::cout << GREEN << "Bot is Running..." << RESET << std::endl;
     fd_bot = socket(AF_INET, SOCK_STREAM, 0);
     if (fd_bot < 0) {
         std::perror("socket");
-        exit(EXIT_FAILURE);
+        exit(1);
     }
-    std::memset(&__bot, 0, sizeof(__bot));
-    __bot.sin_family = AF_INET;
-    __bot.sin_port = htons(std::atoi(av[2]));
-    __bot.sin_addr.s_addr = inet_addr(av[1]);
-	if (connect(fd_bot, (struct sockaddr*)&__bot, sizeof(__bot)) != 0) {
+    std::memset(&_bot, 0, sizeof(_bot));
+    _bot.sin_family = AF_INET;
+    _bot.sin_port = htons(std::atoi(av[2]));
+    _bot.sin_addr.s_addr = inet_addr(av[1]);
+	if (connect(fd_bot, (struct sockaddr*)&_bot, sizeof(_bot)) != 0) {
         close(fd_bot);
         std::perror("connect");
-        return EXIT_FAILURE;
+        return (1);
     }
-    bot_info(fd_bot, "PASS " + pass + "\r\n");
+    bot_auth(fd_bot, "PASS " + password + "\r\n");
     usleep(700);
-    bot_info(fd_bot, "USER boot bot bot boot\r\n");
+    bot_auth(fd_bot, "USER bot bot bot bot\r\n");
     usleep(700);
-    bot_info(fd_bot, "NICK "+nick+"\r\n");
+    bot_auth(fd_bot, "NICK "+ nick +"\r\n");
+	usleep(700);
     char buffer[512];
-    std::string str, rr;
-    while (1) {
+    std::string str, err;
+    while (1)
+	{
         std::memset(buffer, 0, 512);
-        ssize_t readd = read(fd_bot, buffer, 511);
-        if (readd <= 0)
+        ssize_t buf = read(fd_bot, buffer, 511);
+        if (buf <= 0)
             break;
-        buffer[readd] = '\0';
+        buffer[buf] = '\0';
         str = buffer;
         if (str.empty())
             continue;
-        rr = str.substr(str.find(" ") + 1, 3);
-        if (rr == "464" || rr == "461") {
-            std::cout << "U must put the correct Password ,Try Again.. :/" << std::endl;
+        err = str.substr(str.find(" ") + 1, 3);
+        if (err == "464" || err == "461") {
+            std::cout << RED << "Incoerrect Password, Try Again.. :/" << RESET << std::endl;
             close(fd_bot);
             return 1;
         }
-        if (rr == "433" || rr == "432" || rr == "431") {
-            std::cout << "This nickname is used or Error in NickName, Try Again.. :/" << std::endl;
+        if (err == "433" || err == "432" || err == "431") {
+            std::cout << RED << "The Nick Name is already used, Try Again.. :/" << RESET << std::endl;
             close(fd_bot);
-            return 1;
+            return (1);
         }
         if (str.substr(0, 4) == "PING") {
             std::string num_pong = "PONG " + str.substr(6);
@@ -104,8 +114,8 @@ int main(int ac, char *av[]) {
         if (test == "PRIVMSG")
         {
             std::string nick = str.substr(1, str.find("!") - 1);
-            if(is_privmsg(fd_bot, str, nick)) {
-                std::string str1 = "PRIVMSG " + nick + " :no jokes in database, Try the command again..\r\n";
+            if(check_msg(str, nick, fd_bot)) {
+				std::string str1 = "PRIVMSG" + nick + " : Error in Jokes File, Try Again.. \r\n";
                 send(fd_bot, str1.c_str(),str1.length(),0);
                 continue;
             }
@@ -113,5 +123,5 @@ int main(int ac, char *av[]) {
         }
     }
     close(fd_bot);
-    return EXIT_SUCCESS;
+    return 0;
 }
