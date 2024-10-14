@@ -42,7 +42,7 @@ int Server::PRIVMSG(std::string cmd, Client& client)
             else
             {
                 Client *cl = getClientByNickNameS(receiver.at(i));
-                if(!cl)
+                if(!cl || cl->getState() != REGISTERED)
                 {
                     client.reply(ERR_NOSUCHNICK(client.getHost(),client.getNickname(),receiver.at(i)));
                     continue;
