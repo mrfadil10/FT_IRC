@@ -1,4 +1,4 @@
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
 
 int bot_info(int fd_bot, const std::string &cmd) {
     write(fd_bot,cmd.c_str(),cmd.length());
@@ -68,10 +68,6 @@ int main(int ac, char *av[]) {
         std::perror("connect");
         return EXIT_FAILURE;
     }
-    // if (bot_info(fd_bot,)) {
-    //     close(fd_bot);
-    //     return EXIT_FAILURE;
-    // }
     bot_info(fd_bot, "PASS " + pass + "\r\n");
     usleep(700);
     bot_info(fd_bot, "USER boot bot bot boot\r\n");
