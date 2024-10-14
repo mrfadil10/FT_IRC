@@ -270,7 +270,7 @@ void	Server::handleMessage(int fd)
 	}
 	if(!del_break(_cmd).empty())
 		parseCmd(_cmd, *findClient(fd),fd);
-	displayClient();
+	// displayClient();
 }
 
 void	Server::parseCmd(std::string str, Client &cl,int fd)

@@ -2,7 +2,7 @@ NAME = ircserv
 BONUS_NAME = botto
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CFLAGS = -Wall -Wextra -Werror -std=c++98 #-g -fsanitize=address
 
 HEADER = ./includes/Server.hpp ./includes/Reply.hpp ./includes/Client.hpp ./includes/Channel.hpp 
 
@@ -70,7 +70,7 @@ $(NAME): $(OBJS) $(HEADER)
 
 $(OBJS_DIR)%.o: %.cpp $(HEADER)
 	@mkdir -p $(OBJS_DIR)server $(OBJS_DIR)Bot
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 bonus: $(BONUS_OBJS)
 	@echo "$(RED)Compiling bonus...$(RESET)⏳"
