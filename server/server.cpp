@@ -155,6 +155,8 @@ void	Server::deletChannelA(std::string nickName)
 	{
 		if(it->second->checkIfIsClient(nickName)  && it->second->get_nbr_client() == 1)
 			channel.push_back(it->first);
+		else if(it->second->checkIfIsClient(nickName))
+			it->second->removeClientNickName(nickName);
 		it++;
 	}
 	for (size_t i = 0; i < channel.size(); i++)
