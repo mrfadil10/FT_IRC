@@ -1,4 +1,4 @@
-#include "../includes/irc.hpp"
+#include "../includes/Server.hpp"
 
 int bot_info(int fd_bot, const std::string &cmd) {
     write(fd_bot,cmd.c_str(),cmd.length());
