@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   channel.hpp                                        :+:      :+:    :+:   */
+/*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ibenaait <ibenaait@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 23:12:27 by ibenaait          #+#    #+#             */
-/*   Updated: 2024/10/13 23:30:21 by ibenaait         ###   ########.fr       */
+/*   Updated: 2024/10/15 13:27:39 by ibenaait         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ class Channel
         int		findClientRole(std::string nikname);
         int		checkIfIsClient(std::string const &nickname);
         void    removeClientNickName(std::string const &nickname);
-		int		checkIfInviteToChannel(Client &c);
+		int		checkIfInviteToChannel(std::string nickName);
 		void	sendReplyAll(const std::string &msg, std::string nickname);
 };
 #endif

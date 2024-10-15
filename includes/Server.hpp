@@ -58,31 +58,32 @@ class Server
 
 
 	public:
-		Server(int port, std::string password);
-		~Server();
+	Server(int port, std::string password);
+	~Server();
 
-	int		createSocket();
-	void	launch();
-	void	handleMessage(int fd);
-	void	displayClient();
-	void							replys(Client &c,std::string msg);
+	int									createSocket();
+	void								launch();
+	void								handleMessage(int fd);
+	void								displayClient();
+	void								replys(Client &c,std::string msg);
 	void								parseCmd(std::string cmd, Client &cl,int fd);
 	std::vector<std::string>			splitCommands(std::string msg);
 	std::string							readMessage(int fd);
 	Client								*getClientByNickNameS(std::string Nickname);
 	int									checkIfChannelExist(std::string &target);
 	Channel								*getChannel(std::string &target);
-	void							joinZero(Client &c);
-	void							clientDisconnect(int fd);
-	void							eraseClient(int fd);
-	void							newCl();
+	void								joinZero(Client &c);
+	void								clientDisconnect(int fd);
+	void								eraseClient(int fd);
+	void								newCl();
 
-	bool							is_used(Client cl, std::string name);
+	bool								is_used(Client cl, std::string name);
 
-	Client							*findClient(int fd);
-	int								findClientInS(std::string nickname);
-	std::map<int,Client*>::iterator	findClientIt(int fd);
-    void		deletChannelA(std::string nickName);
+	Client								*findClient(int fd);
+	int									findClientInS(std::string nickname);
+	std::map<int,Client*>::iterator		findClientIt(int fd);
+    void								deletChannelA(std::string nickName);
+	
 	// IRC Commands...
 	int		MODE(std::string args, Client &c);
 	int		JOIN(std::string args, Client &c);
@@ -91,9 +92,9 @@ class Server
 	int		INVITE(std::string args, Client &c);
 	int		PART(std::string cmd, Client &c);
 	int 	PRIVMSG(std::string args, Client& client);
-	int cmdUser(std::string args, Client &cl);
-	int cmdNick(std::string args, Client &cl);
-	int cmdPass(std::string args, Client &cl);
+	int 	cmdUser(std::string args, Client &cl);
+	int 	cmdNick(std::string args, Client &cl);
+	int 	cmdPass(std::string args, Client &cl);
 
 };
 

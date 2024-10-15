@@ -155,14 +155,14 @@ void	Server::deletChannelA(std::string nickName)
 	{
 		if(it->second->checkIfIsClient(nickName)  && it->second->get_nbr_client() == 1)
 			channel.push_back(it->first);
-		else if(it->second->checkIfIsClient(nickName))
+		else if(it->second->checkIfIsClient(nickName) || it->second->checkIfInviteToChannel(nickName))
 			it->second->removeClientNickName(nickName);
 		it++;
 	}
 	for (size_t i = 0; i < channel.size(); i++)
 	{
-		delete _channels[channel.at(0)];
-		_channels.erase(channel.at(0));
+		delete _channels[channel.at(i)];
+		_channels.erase(channel.at(i));
 	}
 }
 void	Server::eraseClient(int fd)
@@ -599,9 +599,9 @@ void Channel::addClient(int fd, const std::string& nickname, bool isOperator) {
         client[nickname] = std::pair<bool,int>(isOperator,fd);
     }
 
-int	Channel::checkIfInviteToChannel(Client &c)
+int	Channel::checkIfInviteToChannel(std::string nickName)
 {
-	std::map<std::string,int>::iterator v = invite.find(c.getNickname());
+	std::map<std::string,int>::iterator v = invite.find(nickName);
 	if(v != invite.end())
 		return 1;
 	return 0;

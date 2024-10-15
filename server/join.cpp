@@ -53,9 +53,9 @@ int Server::JOIN(std::string cmd, Client &c)
                 c.reply(ERR_USERONCHANNEL(c.getHost(),c.getNickname(),channels[i]));
             else if(cn->getLimit() && cn->get_max_client() <= cn->get_nbr_client())
                 c.reply(ERR_CHANNELISFULL(c.getHost(),c.getNickname(),channels[i]));
-            else if(cn->getInviteOnly() && !cn->checkIfInviteToChannel(c))
+            else if(cn->getInviteOnly() && !cn->checkIfInviteToChannel(c.getNickname()))
                 c.reply(ERR_INVITEONLY(c.getHost(),c.getNickname(),channels[i]));
-            else if(cn->getKey() && cn->get_password().compare(keys) != 0 && !cn->checkIfInviteToChannel(c))
+            else if(cn->getKey() && cn->get_password().compare(keys) != 0 && !cn->checkIfInviteToChannel(c.getNickname()))
                 c.reply(ERR_BADCHANNELKEY(c.getNickname(),c.getHost(),channels[i]));
             else 
             {
