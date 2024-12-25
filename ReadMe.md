@@ -29,14 +29,7 @@ An Internet Relay Chat (IRC) server implementation with IRC Bot and FTP file tra
 ### IRC Bot
 - Custom command handling
 - Automated responses
-- Channel moderation
-- User assistance
-- Event logging
-- Message filtering
 - Fun commands and games
-- Weather updates
-- Currency conversion
-- Urban Dictionary lookup
 
 ### FTP Implementation
 - File upload/download
