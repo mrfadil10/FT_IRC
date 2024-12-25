@@ -1,12 +1,68 @@
-readme ...........f
+# ft_irc
 
-ERROR
+An Internet Relay Chat (IRC) server implementation following RFC 2812 specifications
 
+## Usage
+```bash
+make
+./ircserv <port> <password>
+```
 
+## Features
+- TCP/IP socket programming
+- Non-blocking I/O with poll()
+- Client authentication
+- Channel operations
+- Private messaging
+- User modes
+- Channel modes
+- Operator privileges
+- Nickname management
+- Command parsing
 
+## Supported Commands
+- `/join`: Join channels
+- `/part`: Leave channels
+- `/quit`: Disconnect
+- `/nick`: Change nickname
+- `/privmsg`: Send messages
+- `/notice`: Send notices
+- `/kick`: Remove users
+- `/invite`: Invite users
+- `/topic`: Manage channel topics
+- `/mode`: Set modes
+- `/who`: Query user info
+- `/whois`: Detailed user info
 
+## Technical Details
+- C++ implementation
+- RFC 2812 compliant
+- Socket programming
+- Multiple client handling
+- Buffer management
+- Error handling
+- Memory management
 
+## Project Structure
+```
+ft_irc/
+├── Bot/
+├── includes/
+├── server/
+│   └── irc.hpp
+└── Makefile
+```
 
+## Testing
+- Compatible with standard IRC clients
+- Tested with:
+  - irssi
+  - WeeChat
+  - NetCat
 
-
-if change nick 5aso changa fga3 channel ///fix
+## Error Handling
+- Socket errors
+- Client disconnection
+- Invalid commands
+- Permission checks
+- Buffer overflow protection
