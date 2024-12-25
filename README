@@ -1,6 +1,6 @@
 # ft_irc
 
-An Internet Relay Chat (IRC) server implementation following RFC 2812 specifications
+An Internet Relay Chat (IRC) server implementation following RFC 2812 specifications.
 
 ## Usage
 ```bash
